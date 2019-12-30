@@ -5,6 +5,7 @@ I like some things about go, but not others, and this is kind of my way of fixin
 ## Sample Code
 
 ```
+// Comments
 func foo(a I32, b I32) {
   x I32 := 3
   y := 3
