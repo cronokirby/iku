@@ -1,4 +1,4 @@
-// SHOULDBE 2
+// SHOULDPRINT 2
 func main() {
-  2
+  print(2)
 }
