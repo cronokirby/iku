@@ -13,7 +13,6 @@ pub enum AST {
 /// Handle escape sequences
 #[allow(dead_code)]
 pub fn process_string_litteral(input: &str) -> String {
-    println!("{:?}", input);
     let mut acc = String::new();
     let mut escaping = false;
     for c in input.chars() {
@@ -25,7 +24,6 @@ pub fn process_string_litteral(input: &str) -> String {
             (true, '\\') => acc.push('\\'),
             (true, 'r') => acc.push('\r'),
             (true, 't') => acc.push('\t'),
-            (true, '0') => acc.push('\0'),
             (true, c) => {
                 acc.push('\\');
                 acc.push(c)
@@ -37,7 +35,6 @@ pub fn process_string_litteral(input: &str) -> String {
             escaping = false;
         }
     }
-    println!("{:?}", acc);
     acc
 }
 
