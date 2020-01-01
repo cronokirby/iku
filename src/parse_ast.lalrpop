@@ -13,6 +13,6 @@ Expr: Expr = {
 };
 
 I32: i32 = {
-  r"[0-9]+" => i32::from_str(<>).unwrap()
+  r"-?[0-9]+" => i32::from_str(<>).unwrap()
 };
 
