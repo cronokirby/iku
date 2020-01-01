@@ -1,0 +1,3 @@
+func main() {
+  print("\n\t\0\r\\今日はhello")
+}
