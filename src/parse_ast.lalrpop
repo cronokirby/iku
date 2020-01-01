@@ -1,0 +1,18 @@
+use std::str::FromStr;
+use crate::ast::*;
+
+grammar;
+
+pub AST: AST = {
+  "func" "main" "(" ")" "{" <Expr> "}" => AST::FuncMain(<>)
+};
+
+Expr: Expr = {
+  "print" "(" <Expr> ")" => Expr::Print(Box::new(<>)),
+  <I32> => Expr::I32(<>)
+};
+
+I32: i32 = {
+  r"[0-9]+" => i32::from_str(<>).unwrap()
+};
+

@@ -1,4 +1,3 @@
-// SHOULDPRINT 2
 func main() {
   print(2)
 }
