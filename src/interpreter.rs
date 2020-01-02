@@ -19,6 +19,7 @@ impl Context for RealContext {
     }
 }
 
+/// Represents an Interpreter holding context allowing it to function
 struct Interpreter<C> {
     ctx: C,
 }
@@ -53,6 +54,7 @@ impl<C: Context> Interpreter<C> {
     }
 }
 
+/// Interpret a program given some context for the interpreter to use.
 pub fn interpret<C: Context>(ctx: C, ast: &AST) {
     let mut interpreter = Interpreter { ctx };
     interpreter.interpret(ast);
