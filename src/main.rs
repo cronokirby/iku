@@ -2,11 +2,12 @@
 extern crate lalrpop_util;
 lalrpop_mod!(pub parse_ast);
 mod ast;
-mod backend;
+mod interpreter;
+#[cfg(test)]
+mod test_programs;
 
-fn main() -> std::io::Result<()> {
-    let prog = include_str!("../test-programs/3.iku");
+fn main() {
+    let prog = include_str!("../test-programs/1.iku");
     let ast = parse_ast::ASTParser::new().parse(prog).unwrap();
-    let mut out = std::io::stdout();
-    backend::generate(&mut out, ast)
+    interpreter::interpret(interpreter::RealContext, &ast);
 }
