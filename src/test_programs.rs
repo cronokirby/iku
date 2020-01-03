@@ -1,6 +1,7 @@
 use crate::ast::*;
 use crate::interpreter::{interpret, Context};
 use crate::parse_ast::ASTParser;
+use crate::lexer::Lexer;
 
 const PROG_1: &'static str = include_str!("../test-programs/1.iku");
 const PROG_2: &'static str = include_str!("../test-programs/2.iku");
@@ -25,7 +26,8 @@ impl<'a> Context for FakeContext<'a> {
 
 #[test]
 fn test_prog_1() {
-    let res = ASTParser::new().parse(PROG_1);
+    let lexer = Lexer::new(PROG_1);
+    let res = ASTParser::new().parse(lexer);
     let ast = AST::FuncMain(Expr::Print(Box::new(Expr::I32(2))));
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
@@ -35,7 +37,8 @@ fn test_prog_1() {
 
 #[test]
 fn test_prog_2() {
-    let res = ASTParser::new().parse(PROG_2);
+    let lexer = Lexer::new(PROG_2);
+    let res = ASTParser::new().parse(lexer);
     let ast = AST::FuncMain(Expr::Print(Box::new(Expr::I32(-2))));
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
@@ -47,7 +50,8 @@ const PROG_3_LITT: &'static str = "\n\t\r\\今日はhello";
 
 #[test]
 fn test_prog_3() {
-    let res = ASTParser::new().parse(PROG_3);
+    let lexer = Lexer::new(PROG_3);
+    let res = ASTParser::new().parse(lexer);
     let litt = String::from(PROG_3_LITT);
     let ast = AST::FuncMain(Expr::Print(Box::new(Expr::Str(litt))));
     assert_eq!(res.as_ref(), Ok(&ast));

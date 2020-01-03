@@ -9,6 +9,7 @@ mod test_programs;
 
 fn main() {
     let prog = include_str!("../test-programs/1.iku");
-    let ast = parse_ast::ASTParser::new().parse(prog).unwrap();
+    let lexer = lexer::Lexer::new(prog);
+    let ast = parse_ast::ASTParser::new().parse(lexer).unwrap();
     interpreter::interpret(interpreter::RealContext, &ast);
 }

@@ -1,22 +1,29 @@
 use std::str::FromStr;
 use crate::ast::*;
+use crate::lexer;
 
 grammar;
 
 pub AST: AST = {
-  "func" "main" "(" ")" "{" <Expr> "}" => AST::FuncMain(<>)
+  "func" name "(" ")" "{" <Expr> "}" => AST::FuncMain(<>)
 };
 
 Expr: Expr = {
-  "print" "(" <Expr> ")" => Expr::Print(Box::new(<>)),
-  <I32> => Expr::I32(<>),
-  <Str> => Expr::Str(<>)
+  name "(" <Expr> ")" => Expr::Print(Box::new(<>)),
+  <value:int> => Expr::I32(value),
 };
 
-I32: i32 = {
-  r"-?[0-9]+" => i32::from_str(<>).unwrap()
-};
+extern {
+  type Location = lexer::Location;
+  type Error = lexer::LexError;
 
-Str: String = {
-  <r#""[^"]*""#> => process_string_litteral(<>)
-};
+  enum lexer::Token {
+    "{" => lexer::Token::OpenBrace,
+    "}" => lexer::Token::CloseBrace,
+    "(" => lexer::Token::OpenParens,
+    ")" => lexer::Token::CloseParens,
+    "func" => lexer::Token::Func,
+    name => lexer::Token::Name { value: <String> },
+    int => lexer::Token::IntLitteral { value: <i32> },
+  }
+}
