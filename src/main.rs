@@ -3,6 +3,7 @@ extern crate lalrpop_util;
 lalrpop_mod!(pub parse_ast);
 mod ast;
 mod interpreter;
+mod lexer;
 #[cfg(test)]
 mod test_programs;
 
