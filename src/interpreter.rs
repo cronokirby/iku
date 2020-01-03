@@ -1,5 +1,4 @@
 use crate::ast::*;
-use std::collections::HashMap;
 
 /// Represents the contextual abilities an interpreter needs.
 ///
@@ -20,12 +19,31 @@ impl Context for RealContext {
     }
 }
 
+/// Represents the type of error produced by an interpreter
+///
+/// These kinds of errors are caused by the user giving us bad code.
+/// The interpreter can also panic, if the programmer writing the interpreter
+/// made a mistake.
+#[derive(Clone, Debug, PartialEq)]
+pub struct InterpreterError {
+    message: String,
+}
+
+/// A wrapper type for results that fail in an interpreter
+pub type InterpreterResult<T> = Result<T, InterpreterError>;
+
+fn fail<T, S: Into<String>>(message: S) -> InterpreterResult<T> {
+    Err(InterpreterError {
+        message: message.into(),
+    })
+}
+
 /// Represents an Interpreter holding context allowing it to function
 struct Interpreter<C> {
     ctx: C,
 }
 
-impl <C: Context> Interpreter<C> {
+impl<C: Context> Interpreter<C> {
     fn print_expr(&mut self, e: &Expr) {
         match e {
             Expr::I32(i) => self.ctx.print(&format!("{}\n", i)),
@@ -37,29 +55,31 @@ impl <C: Context> Interpreter<C> {
         }
     }
 
-    fn eval_expr(&mut self, e: &Expr) -> Expr {
+    fn eval_expr(&mut self, e: &Expr) -> InterpreterResult<Expr> {
         match e {
             Expr::Call(name, e) => {
-                let inside = self.eval_expr(e);
+                let inside = self.eval_expr(e)?;
                 match name.as_ref() {
-                    "print" => self.print_expr(&inside),
-                    _ => panic!("Trying to call unknown function {}", name)
+                    "print" => {
+                        self.print_expr(&inside);
+                        Ok(inside)
+                    }
+                    _ => fail(format!("Trying to call unknown function {}", name)),
                 }
-                inside
             }
-            other => other.clone(),
+            other => Ok(other.clone()),
         }
     }
 
-    fn interpret(&mut self, ast: &AST) {
+    fn interpret(&mut self, ast: &AST) -> InterpreterResult<Expr> {
         match ast {
             AST::FuncMain(e) => self.eval_expr(e),
-        };
+        }
     }
 }
 
 /// Interpret a program given some context for the interpreter to use.
-pub fn interpret<C: Context>(ctx: C, ast: &AST) {
+pub fn interpret<C: Context>(ctx: C, ast: &AST) -> InterpreterResult<Expr> {
     let mut interpreter = Interpreter { ctx };
-    interpreter.interpret(ast);
+    interpreter.interpret(ast)
 }

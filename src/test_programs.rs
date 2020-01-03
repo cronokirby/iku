@@ -31,7 +31,7 @@ fn test_prog_1() {
     let ast = AST::FuncMain(Expr::Call(String::from("print"), Box::new(Expr::I32(2))));
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
-    interpret(FakeContext::new(&mut interpreted), &ast);
+    assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "2\n");
 }
 
@@ -42,7 +42,7 @@ fn test_prog_2() {
     let ast = AST::FuncMain(Expr::Call(String::from("print"), Box::new(Expr::I32(-2))));
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
-    interpret(FakeContext::new(&mut interpreted), &ast);
+    assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "-2\n");
 }
 
@@ -56,6 +56,6 @@ fn test_prog_3() {
     let ast = AST::FuncMain(Expr::Call(String::from("print"), Box::new(Expr::Str(litt))));
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
-    interpret(FakeContext::new(&mut interpreted), &ast);
+    assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, &format!("{}\n", PROG_3_LITT));
 }
