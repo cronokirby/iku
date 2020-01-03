@@ -15,6 +15,7 @@ pub enum Expr {
 /// probably change at some point.
 #[derive(Clone, Debug, PartialEq)]
 pub enum AST {
-    FuncMain(Expr),
+    /// A main function containing a list of expressions
+    FuncMain(Vec<Expr>),
 }
 

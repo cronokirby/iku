@@ -4,8 +4,12 @@ use crate::lexer;
 grammar;
 
 pub AST: AST = {
-  "func" name "(" ")" "{" <Expr> "}" => AST::FuncMain(<>)
+  "func" name "(" ")" "{" <Exprs> "}" => AST::FuncMain(<>)
 };
+
+Exprs: Vec<Expr> = {
+  <(<Expr> ";")*>
+}
 
 Expr: Expr = {
   <value:name> "(" <e:Expr> ")" => Expr::Call(value, Box::new(e)),
@@ -22,6 +26,7 @@ extern {
     "}" => lexer::Token::CloseBrace,
     "(" => lexer::Token::OpenParens,
     ")" => lexer::Token::CloseParens,
+    ";" => lexer::Token::Semicolon,
     "func" => lexer::Token::Func,
     name => lexer::Token::Name { value: <String> },
     int => lexer::Token::IntLitteral { value: <i32> },

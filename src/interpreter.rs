@@ -73,7 +73,13 @@ impl<C: Context> Interpreter<C> {
 
     fn interpret(&mut self, ast: &AST) -> InterpreterResult<Expr> {
         match ast {
-            AST::FuncMain(e) => self.eval_expr(e),
+            AST::FuncMain(exprs) => {
+                let mut res = Expr::I32(0);
+                for e in exprs {
+                    res = self.eval_expr(e)?;
+                }
+                Ok(res)
+            }
         }
     }
 }
