@@ -149,7 +149,7 @@ impl<'d> Iterator for Lexer<'d> {
         let message = format!("Unrecognized characters at position {}", self.pos);
         // Since nothing matched, we have to skip to the end
         self.pos += current_data.len();
-        return Some(Err(LexError { message }));
+        Some(Err(LexError { message }))
     }
 }
 
