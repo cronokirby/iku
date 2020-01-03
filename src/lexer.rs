@@ -1,5 +1,5 @@
-use std::str::FromStr;
 use regex::{Regex, RegexSet};
+use std::str::FromStr;
 
 /// Represents the type of token our lexer produces
 ///
@@ -12,8 +12,36 @@ pub enum Token {
     OpenParens,
     CloseParens,
     Func,
-    IntLitteral { value:  i32 },
+    StringLitteral { value: String },
+    IntLitteral { value: i32 },
     Name { value: String },
+}
+
+/// Handle escape sequences when processing a litteral string.
+pub fn process_string_litteral(input: &str) -> String {
+    let mut acc = String::new();
+    let mut escaping = false;
+    for c in input.chars() {
+        let was_escaping = escaping;
+        match (escaping, c) {
+            // This will only be the first and last
+            (_, '"') => {}
+            (true, 'n') => acc.push_str("\n"),
+            (true, '\\') => acc.push('\\'),
+            (true, 'r') => acc.push('\r'),
+            (true, 't') => acc.push('\t'),
+            (true, c) => {
+                acc.push('\\');
+                acc.push(c)
+            }
+            (false, '\\') => escaping = true,
+            (false, c) => acc.push(c),
+        }
+        if was_escaping {
+            escaping = false;
+        }
+    }
+    acc
 }
 
 /// Represents the type of error that can happen while lexing.
@@ -46,6 +74,7 @@ pub struct Lexer<'d> {
     pos: usize,
     simple_matchers: RegexSet,
     whitespace_matcher: Regex,
+    string_litteral_matcher: Regex,
     int_litteral_matcher: Regex,
     name_matcher: Regex,
 }
@@ -54,13 +83,15 @@ impl<'d> Lexer<'d> {
     pub fn new(data: &'d str) -> Lexer {
         let simple_matchers = RegexSet::new(&SIMPLE_MATCH_STRINGS).unwrap();
         let whitespace_matcher = Regex::new(r"^\s+").unwrap();
-        let int_litteral_matcher = Regex::new(r"-?[0-9]+").unwrap();
+        let int_litteral_matcher = Regex::new(r"^-?[0-9]+").unwrap();
+        let string_litteral_matcher = Regex::new(r#"^"([^"]*)""#).unwrap();
         let name_matcher = Regex::new(r"^[a-z]\w*").unwrap();
         Lexer {
             data,
             pos: 0,
             simple_matchers,
             whitespace_matcher,
+            string_litteral_matcher,
             int_litteral_matcher,
             name_matcher,
         }
@@ -87,9 +118,22 @@ impl<'d> Iterator for Lexer<'d> {
         }
         if let Some(mat) = self.name_matcher.find(current_data) {
             let matched_string = mat.as_str();
-            let matched_token = Token::Name { value: String::from(matched_string) };
+            let matched_token = Token::Name {
+                value: String::from(matched_string),
+            };
             let start = Location(self.pos);
             self.pos += matched_string.len();
+            let end = Location(self.pos);
+            return Some(Ok((start, matched_token, end)));
+        }
+        if let Some(caps) = self.string_litteral_matcher.captures(current_data) {
+            let matched_string = caps.get(1).unwrap().as_str();
+            let matched_token = Token::StringLitteral {
+                value: process_string_litteral(matched_string),
+            };
+            let start = Location(self.pos);
+            let total_match = caps.get(0).unwrap();
+            self.pos += total_match.end() - total_match.start();
             let end = Location(self.pos);
             return Some(Ok((start, matched_token, end)));
         }
@@ -117,7 +161,9 @@ mod test {
     fn unicode_names_can_be_lexed() {
         let a_cat = "a猫";
         let mut lexer = Lexer::new(a_cat);
-        let token = Token::Name { value: String::from(a_cat) };
+        let token = Token::Name {
+            value: String::from(a_cat),
+        };
         let span = (Location(0), token, Location(a_cat.len()));
         assert_eq!(lexer.next(), Some(Ok(span)));
     }
@@ -129,8 +175,29 @@ mod test {
         let result: Vec<Span> = lexer.collect();
         let spans = vec![
             Ok((Location(0), Token::Func, Location(4))),
-            Ok((Location(5), Token::Name { value: String::from("main") }, Location(9))),
+            Ok((
+                Location(5),
+                Token::Name {
+                    value: String::from("main"),
+                },
+                Location(9),
+            )),
         ];
+        assert_eq!(result, spans);
+    }
+
+    #[test]
+    fn string_litterals_lex() {
+        let input = r#""\n""#;
+        let lexer = Lexer::new(input);
+        let result: Vec<Span> = lexer.collect();
+        let spans = vec![Ok((
+            Location(0),
+            Token::StringLitteral {
+                value: String::from("\n"),
+            },
+            Location(4),
+        ))];
         assert_eq!(result, spans);
     }
 }

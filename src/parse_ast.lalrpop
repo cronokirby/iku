@@ -1,4 +1,3 @@
-use std::str::FromStr;
 use crate::ast::*;
 use crate::lexer;
 
@@ -11,6 +10,7 @@ pub AST: AST = {
 Expr: Expr = {
   name "(" <Expr> ")" => Expr::Print(Box::new(<>)),
   <value:int> => Expr::I32(value),
+  <value:string> => Expr::Str(value),
 };
 
 extern {
@@ -25,5 +25,6 @@ extern {
     "func" => lexer::Token::Func,
     name => lexer::Token::Name { value: <String> },
     int => lexer::Token::IntLitteral { value: <i32> },
+    string => lexer::Token::StringLitteral { value: <String> }
   }
 }
