@@ -28,7 +28,7 @@ impl<'a> Context for FakeContext<'a> {
 fn test_prog_1() {
     let lexer = Lexer::new(PROG_1);
     let res = ASTParser::new().parse(lexer);
-    let ast = AST::FuncMain(Expr::Print(Box::new(Expr::I32(2))));
+    let ast = AST::FuncMain(Expr::Call(String::from("print"), Box::new(Expr::I32(2))));
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     interpret(FakeContext::new(&mut interpreted), &ast);
@@ -39,7 +39,7 @@ fn test_prog_1() {
 fn test_prog_2() {
     let lexer = Lexer::new(PROG_2);
     let res = ASTParser::new().parse(lexer);
-    let ast = AST::FuncMain(Expr::Print(Box::new(Expr::I32(-2))));
+    let ast = AST::FuncMain(Expr::Call(String::from("print"), Box::new(Expr::I32(-2))));
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     interpret(FakeContext::new(&mut interpreted), &ast);
@@ -53,7 +53,7 @@ fn test_prog_3() {
     let lexer = Lexer::new(PROG_3);
     let res = ASTParser::new().parse(lexer);
     let litt = String::from(PROG_3_LITT);
-    let ast = AST::FuncMain(Expr::Print(Box::new(Expr::Str(litt))));
+    let ast = AST::FuncMain(Expr::Call(String::from("print"), Box::new(Expr::Str(litt))));
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     interpret(FakeContext::new(&mut interpreted), &ast);

@@ -3,7 +3,8 @@
 /// Expressions can be evaluated to some kind of value.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
-    Print(Box<Expr>),
+    /// Call a function by name, with arguments expression
+    Call(String, Box<Expr>),
     I32(i32),
     Str(String),
 }

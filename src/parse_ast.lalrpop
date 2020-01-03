@@ -8,7 +8,7 @@ pub AST: AST = {
 };
 
 Expr: Expr = {
-  name "(" <Expr> ")" => Expr::Print(Box::new(<>)),
+  <value:name> "(" <e:Expr> ")" => Expr::Call(value, Box::new(e)),
   <value:int> => Expr::I32(value),
   <value:string> => Expr::Str(value),
 };
