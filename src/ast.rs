@@ -32,12 +32,22 @@ pub enum Expr {
     Name(String),
 }
 
+/// Represents a function definition.
+///
+/// Functions have a name, as well as some code to run when they're called.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Function {
+    /// The name we can use to call the function
+    pub name: String,
+    /// The series of expressions making up the body of this function
+    pub body: Vec<Expr>,
+}
+
 /// Represents the full abstract syntax tree of an Iku program.
 ///
 /// At the moment, a program is synonymous with a single file. This will
 /// probably change at some point.
 #[derive(Clone, Debug, PartialEq)]
-pub enum AST {
-    /// A main function containing a series of expressions
-    FuncMain(Vec<Expr>),
+pub struct AST {
+    pub functions: Vec<Function>,
 }

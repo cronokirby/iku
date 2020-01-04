@@ -1,6 +1,10 @@
 use crate::ast::*;
 use std::collections::HashMap;
 
+// The value we use when we have nothing to return
+// Eventually this will be an empty tuple
+const VOID: Litteral = Litteral::I64(0);
+
 /// Represents the contextual abilities an interpreter needs.
 ///
 /// This is made into a trait to allow us to abstract over these effects,
@@ -50,9 +54,18 @@ struct Interpreter<C> {
     ctx: C,
     // A collection of variables defined in the main function
     vars: HashMap<String, Litteral>,
+    // Keeping track of functions by their name
+    functions: HashMap<String, Function>,
 }
 
 impl<C: Context> Interpreter<C> {
+    fn new(ctx: C) -> Self {
+        Interpreter {
+            ctx,
+            vars: HashMap::new(),
+            functions: HashMap::new(),
+        }
+    }
     fn print_litteral(&mut self, l: &Litteral) {
         match l {
             Litteral::I64(i) => self.ctx.print(&format!("{}\n", i)),
@@ -99,24 +112,40 @@ impl<C: Context> Interpreter<C> {
         }
     }
 
-    fn interpret(&mut self, ast: &AST) -> InterpreterResult<Litteral> {
-        match ast {
-            AST::FuncMain(exprs) => {
-                let mut res = Litteral::I64(0);
-                for e in exprs {
-                    res = self.eval_expr(e)?;
+    fn call_function(&mut self, name: &str, arg: &Litteral) -> InterpreterResult<Litteral> {
+        match name {
+            "print" => {
+                self.print_litteral(arg);
+                return Ok(VOID);
+            }
+            _ => {}
+        };
+        match self.functions.get(name) {
+            None => fail(format!("Trying to call undefined function {}", name)),
+            Some(f) => {
+                let mut res = VOID;
+                // We need to clone, because Rust doesn't know that evaluation
+                // won't change the contents of f
+                for e in f.body.clone() {
+                    res = self.eval_expr(&e)?;
                 }
                 Ok(res)
             }
         }
     }
+
+    fn interpret(&mut self, ast: &AST) -> InterpreterResult<Litteral> {
+        for f in &ast.functions {
+            if self.functions.insert(f.name.clone(), f.clone()).is_some() {
+                return fail(format!("Redefinition of function {}", f.name));
+            }
+        }
+        self.call_function("main", &VOID)
+    }
 }
 
 /// Interpret a program given some context for the interpreter to use.
 pub fn interpret<C: Context>(ctx: C, ast: &AST) -> InterpreterResult<Litteral> {
-    let mut interpreter = Interpreter {
-        ctx,
-        vars: HashMap::new(),
-    };
+    let mut interpreter = Interpreter::new(ctx);
     interpreter.interpret(ast)
 }

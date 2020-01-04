@@ -33,10 +33,16 @@ impl<'a> Context for FakeContext<'a> {
 fn test_prog_1() {
     let lexer = Lexer::new(PROG_1);
     let res = ASTParser::new().parse(lexer);
-    let ast = AST::FuncMain(vec![Expr::Call(
+    let body = vec![Expr::Call(
         String::from("print"),
         Box::new(Expr::Litt(Litteral::I64(2))),
-    )]);
+    )];
+    let ast = AST {
+        functions: vec![Function {
+            name: "main".into(),
+            body,
+        }],
+    };
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
@@ -47,10 +53,16 @@ fn test_prog_1() {
 fn test_prog_2() {
     let lexer = Lexer::new(PROG_2);
     let res = ASTParser::new().parse(lexer);
-    let ast = AST::FuncMain(vec![Expr::Call(
+    let body = vec![Expr::Call(
         String::from("print"),
         Box::new(Expr::Litt(Litteral::I64(-2))),
-    )]);
+    )];
+    let ast = AST {
+        functions: vec![Function {
+            name: "main".into(),
+            body,
+        }],
+    };
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
@@ -64,10 +76,16 @@ fn test_prog_3() {
     let lexer = Lexer::new(PROG_3);
     let res = ASTParser::new().parse(lexer);
     let litt = String::from(PROG_3_LITT);
-    let ast = AST::FuncMain(vec![Expr::Call(
+    let body = vec![Expr::Call(
         String::from("print"),
         Box::new(Expr::Litt(Litteral::Str(litt))),
-    )]);
+    )];
+    let ast = AST {
+        functions: vec![Function {
+            name: "main".into(),
+            body,
+        }],
+    };
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
@@ -78,7 +96,7 @@ fn test_prog_3() {
 fn test_prog_4() {
     let lexer = Lexer::new(PROG_4);
     let res = ASTParser::new().parse(lexer);
-    let ast = AST::FuncMain(vec![
+    let body = vec![
         Expr::Call(
             String::from("print"),
             Box::new(Expr::Litt(Litteral::I64(1))),
@@ -87,7 +105,13 @@ fn test_prog_4() {
             String::from("print"),
             Box::new(Expr::Litt(Litteral::I64(2))),
         ),
-    ]);
+    ];
+    let ast = AST {
+        functions: vec![Function {
+            name: "main".into(),
+            body,
+        }],
+    };
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
@@ -98,7 +122,7 @@ fn test_prog_4() {
 fn test_prog_5() {
     let lexer = Lexer::new(PROG_5);
     let res = ASTParser::new().parse(lexer);
-    let ast = AST::FuncMain(vec![
+    let body = vec![
         Expr::Call(
             String::from("print"),
             Box::new(Expr::Litt(Litteral::I64(1))),
@@ -107,7 +131,13 @@ fn test_prog_5() {
             String::from("print"),
             Box::new(Expr::Litt(Litteral::I64(2))),
         ),
-    ]);
+    ];
+    let ast = AST {
+        functions: vec![Function {
+            name: "main".into(),
+            body,
+        }],
+    };
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
@@ -118,7 +148,7 @@ fn test_prog_5() {
 fn test_prog_6() {
     let lexer = Lexer::new(PROG_6);
     let res = ASTParser::new().parse(lexer);
-    let ast = AST::FuncMain(vec![
+    let body = vec![
         Expr::Call(
             String::from("print"),
             Box::new(Expr::Litt(Litteral::I64(6))),
@@ -127,7 +157,13 @@ fn test_prog_6() {
             String::from("print"),
             Box::new(Expr::Litt(Litteral::I64(6))),
         ),
-    ]);
+    ];
+    let ast = AST {
+        functions: vec![Function {
+            name: "main".into(),
+            body,
+        }],
+    };
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
@@ -138,7 +174,7 @@ fn test_prog_6() {
 fn test_prog_7() {
     let lexer = Lexer::new(PROG_7);
     let res = ASTParser::new().parse(lexer);
-    let ast = AST::FuncMain(vec![
+    let body = vec![
         Expr::Declare("x".into(), Box::new(Expr::Litt(Litteral::I64(2)))),
         Expr::Declare(
             "y".into(),
@@ -150,7 +186,13 @@ fn test_prog_7() {
         Expr::Call("print".into(), Box::new(Expr::Name("x".into()))),
         Expr::Call("print".into(), Box::new(Expr::Name("y".into()))),
         Expr::Call("print".into(), Box::new(Expr::Name("z".into()))),
-    ]);
+    ];
+    let ast = AST {
+        functions: vec![Function {
+            name: "main".into(),
+            body,
+        }],
+    };
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
@@ -161,12 +203,18 @@ fn test_prog_7() {
 fn test_prog_8() {
     let lexer = Lexer::new(PROG_8);
     let res = ASTParser::new().parse(lexer);
-    let ast = AST::FuncMain(vec![
+    let body = vec![
         Expr::Declare("x".into(), Box::new(Expr::Litt(Litteral::I64(2)))),
         Expr::Call("print".into(), Box::new(Expr::Name("x".into()))),
         Expr::Assign("x".into(), Box::new(Expr::Litt(Litteral::I64(3)))),
         Expr::Call("print".into(), Box::new(Expr::Name("x".into()))),
-    ]);
+    ];
+    let ast = AST {
+        functions: vec![Function {
+            name: "main".into(),
+            body,
+        }],
+    };
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());

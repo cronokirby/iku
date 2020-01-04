@@ -4,12 +4,16 @@ use crate::lexer;
 grammar;
 
 pub AST: AST = {
-  "func" name "(" ")" "{" <Exprs> "}" => AST::FuncMain(<>)
+  <functions:Function*> => AST {<>},
 };
 
-Exprs: Vec<Expr> = {
-  <(<Expr> ";")*>
-}
+Function: Function = {
+  "func" <name:name> "(" ")" <body:Block> => Function { name, body },
+};
+
+Block: Vec<Expr> = {
+  "{" <(<Expr> ";")*> "}"
+};
 
 Expr: Expr = {
   <value:name> "(" <e:Expr> ")" => Expr::Call(value, Box::new(e)),
