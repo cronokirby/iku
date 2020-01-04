@@ -74,7 +74,9 @@ const SIMPLE_MATCH_TOKENS: [Token; 6] = [
 pub struct Lexer<'d> {
     data: &'d str,
     pos: usize,
+    can_insert_semi: bool,
     simple_matchers: RegexSet,
+    /// Matches any amount of whitespace
     whitespace_matcher: Regex,
     string_litteral_matcher: Regex,
     int_litteral_matcher: Regex,
@@ -91,6 +93,7 @@ impl<'d> Lexer<'d> {
         Lexer {
             data,
             pos: 0,
+            can_insert_semi: false,
             simple_matchers,
             whitespace_matcher,
             string_litteral_matcher,
@@ -98,14 +101,20 @@ impl<'d> Lexer<'d> {
             name_matcher,
         }
     }
-}
 
-impl<'d> Iterator for Lexer<'d> {
-    type Item = Span;
-
-    fn next(&mut self) -> Option<Span> {
+    // This is like next, but next wants to modify the state of can_insert_semi
+    fn advance(&mut self) -> Option<Span> {
         while let Some(mat) = self.whitespace_matcher.find(&self.data[self.pos..]) {
+            let start = Location(self.pos);
             self.pos += mat.end() - mat.start();
+            let end = Location(self.pos);
+            // If at some point in that whitespace there was a newline, and
+            // we should insert semicolons at this point in the lexing process,
+            // then we create a semicolon token. This will trait multiple newlines
+            // as a single semicolon.
+            if self.can_insert_semi && mat.as_str().contains("\n") {
+                return Some(Ok((start, Token::Semicolon, end)));
+            }
         }
         if self.pos >= self.data.len() {
             return None;
@@ -152,6 +161,24 @@ impl<'d> Iterator for Lexer<'d> {
         // Since nothing matched, we have to skip to the end
         self.pos += current_data.len();
         Some(Err(LexError { message }))
+    }
+}
+
+impl<'d> Iterator for Lexer<'d> {
+    type Item = Span;
+
+    fn next(&mut self) -> Option<Span> {
+        let res = self.advance();
+        if let Some(Ok((_, tok, _))) = &res {
+            self.can_insert_semi = match tok {
+                Token::CloseParens => true,
+                Token::IntLitteral { .. } => true,
+                Token::StringLitteral { .. } => true,
+                Token::Name { .. } => true,
+                _ => false,
+            };
+        };
+        res
     }
 }
 
