@@ -248,7 +248,6 @@ fn test_prog_9() {
     };
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
-    dbg!(interpret(FakeContext::new(&mut interpreted), &ast));
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "1\n");
 }
