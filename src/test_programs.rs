@@ -9,6 +9,7 @@ const PROG_3: &'static str = include_str!("../test-programs/3.iku");
 const PROG_4: &'static str = include_str!("../test-programs/4.iku");
 const PROG_5: &'static str = include_str!("../test-programs/5.iku");
 const PROG_6: &'static str = include_str!("../test-programs/6.iku");
+const PROG_7: &'static str = include_str!("../test-programs/7.iku");
 
 #[derive(Debug)]
 struct FakeContext<'a> {
@@ -130,4 +131,24 @@ fn test_prog_6() {
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "6\n6\n");
+}
+
+#[test]
+fn test_prog_7() {
+    let lexer = Lexer::new(PROG_7);
+    let res = ASTParser::new().parse(lexer);
+    let ast = AST::FuncMain(vec![
+        Expr::Declare("x".into(), Box::new(Expr::Litt(Litteral::I64(2)))),
+        Expr::Declare(
+            "y".into(),
+            Box::new(Expr::Declare(
+                "z".into(),
+                Box::new(Expr::Litt(Litteral::I64(2))),
+            )),
+        ),
+    ]);
+    assert_eq!(res.as_ref(), Ok(&ast));
+    let mut interpreted = String::new();
+    assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
+    assert_eq!(&interpreted, "");
 }

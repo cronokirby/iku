@@ -1,0 +1,7 @@
+// This program tests basic variable declaration
+func main() {
+  // We can declare variables
+  x := 2
+  // y = 2, z = 2
+  y := z := 2
+}

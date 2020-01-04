@@ -1,4 +1,5 @@
 use crate::ast::*;
+use std::collections::HashMap;
 
 /// Represents the contextual abilities an interpreter needs.
 ///
@@ -41,6 +42,8 @@ fn fail<T, S: Into<String>>(message: S) -> InterpreterResult<T> {
 /// Represents an Interpreter holding context allowing it to function
 struct Interpreter<C> {
     ctx: C,
+    // A collection of variables defined in the main function
+    vars: HashMap<String, Litteral>,
 }
 
 impl<C: Context> Interpreter<C> {
@@ -67,6 +70,11 @@ impl<C: Context> Interpreter<C> {
                 }
             }
             Expr::Litt(l) => Ok(l.clone()),
+            Expr::Declare(name, e) => {
+                let result = self.eval_expr(e)?;
+                self.vars.insert(name.clone(), result.clone());
+                Ok(result)
+            }
         }
     }
 
@@ -85,6 +93,9 @@ impl<C: Context> Interpreter<C> {
 
 /// Interpret a program given some context for the interpreter to use.
 pub fn interpret<C: Context>(ctx: C, ast: &AST) -> InterpreterResult<Litteral> {
-    let mut interpreter = Interpreter { ctx };
+    let mut interpreter = Interpreter {
+        ctx,
+        vars: HashMap::new(),
+    };
     interpreter.interpret(ast)
 }

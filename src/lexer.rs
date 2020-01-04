@@ -12,6 +12,8 @@ pub enum Token {
     OpenParens,
     CloseParens,
     Semicolon,
+    /// The := symbol
+    Define,
     Func,
     StringLitteral { value: String },
     IntLitteral { value: i64 },
@@ -60,14 +62,15 @@ pub struct Location(usize);
 /// This is what our lexer produces
 pub type Span = Result<(Location, Token, Location), LexError>;
 
-const SIMPLE_MATCH_STRINGS: [&str; 6] = [r"^\{", r"^\}", r"^\(", r"^\)", r"^;", r"func"];
-const SIMPLE_MATCH_LENGTHS: [usize; 6] = [1, 1, 1, 1, 1, 4];
-const SIMPLE_MATCH_TOKENS: [Token; 6] = [
+const SIMPLE_MATCH_STRINGS: [&str; 7] = [r"^\{", r"^\}", r"^\(", r"^\)", r"^;", r"^:=", r"func"];
+const SIMPLE_MATCH_LENGTHS: [usize; 7] = [1, 1, 1, 1, 1, 2, 4];
+const SIMPLE_MATCH_TOKENS: [Token; 7] = [
     Token::OpenBrace,
     Token::CloseBrace,
     Token::OpenParens,
     Token::CloseParens,
     Token::Semicolon,
+    Token::Define,
     Token::Func,
 ];
 

@@ -15,12 +15,17 @@ pub enum Litteral {
 /// Represents an expression in the Iku language.
 ///
 /// Expressions can be evaluated to some kind of value.
+///
+/// Expression are also synonymous with statements, as all statements
+/// resolve to some value
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
     /// Call a function by name, with arguments expression
     Call(String, Box<Expr>),
     /// Represents the use of a litteral as an expression
     Litt(Litteral),
+    /// A variable declaration, like `x := 2`
+    Declare(String, Box<Expr>),
 }
 
 /// Represents the full abstract syntax tree of an Iku program.
@@ -29,6 +34,6 @@ pub enum Expr {
 /// probably change at some point.
 #[derive(Clone, Debug, PartialEq)]
 pub enum AST {
-    /// A main function containing a list of expressions
+    /// A main function containing a series of expressions
     FuncMain(Vec<Expr>),
 }

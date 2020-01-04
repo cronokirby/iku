@@ -14,6 +14,7 @@ Exprs: Vec<Expr> = {
 Expr: Expr = {
   <value:name> "(" <e:Expr> ")" => Expr::Call(value, Box::new(e)),
   <l:Litteral> => Expr::Litt(l),
+  <value:name> ":=" <e:Expr> => Expr::Declare(value, Box::new(e)),
 };
 
 Litteral: Litteral = {
@@ -31,6 +32,7 @@ extern {
     "(" => lexer::Token::OpenParens,
     ")" => lexer::Token::CloseParens,
     ";" => lexer::Token::Semicolon,
+    ":=" => lexer::Token::Define,
     "func" => lexer::Token::Func,
     name => lexer::Token::Name { value: <String> },
     int => lexer::Token::IntLitteral { value: <i64> },
