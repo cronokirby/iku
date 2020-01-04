@@ -2,3 +2,4 @@
 
 - Allow definition of a main function
 - Allow printing of expressions
+- Insert semicolons implicitly
