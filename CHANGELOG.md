@@ -4,3 +4,4 @@
 - Allow printing of expressions
 - Insert semicolons implicitly
 - Allow single line comments
+- Allow declaration and use of variables
