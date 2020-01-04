@@ -66,7 +66,7 @@ impl<C: Context> Interpreter<C> {
     fn read_name(&mut self, name: &str) -> InterpreterResult<&Litteral> {
         self.vars
             .get(name)
-            .ok_or(format!("Trying to read undefined name {}", name).into())
+            .ok_or(format!("Trying to use undefined variable {}", name).into())
     }
 
     fn eval_expr(&mut self, e: &Expr) -> InterpreterResult<Litteral> {
@@ -87,6 +87,14 @@ impl<C: Context> Interpreter<C> {
                 let result = self.eval_expr(e)?;
                 self.vars.insert(name.clone(), result.clone());
                 Ok(result)
+            }
+            Expr::Assign(name, e) => {
+                let result = self.eval_expr(e)?;
+                if self.vars.insert(name.clone(), result.clone()).is_none() {
+                    fail(format!("Trying to assign to undeclared variable {}", name))
+                } else {
+                    Ok(result)
+                }
             }
         }
     }

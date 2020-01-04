@@ -26,6 +26,8 @@ pub enum Expr {
     Litt(Litteral),
     /// A variable declaration, like `x := 2`
     Declare(String, Box<Expr>),
+    /// A variable assignment, like `x = 3`
+    Assign(String, Box<Expr>),
     /// A reference to a variable name
     Name(String),
 }

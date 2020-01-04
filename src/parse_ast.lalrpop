@@ -15,6 +15,7 @@ Expr: Expr = {
   <value:name> "(" <e:Expr> ")" => Expr::Call(value, Box::new(e)),
   <l:Litteral> => Expr::Litt(l),
   <value:name> ":=" <e:Expr> => Expr::Declare(value, Box::new(e)),
+  <value:name> "=" <e:Expr> => Expr::Assign(value, Box::new(e)),
   <value:name> => Expr::Name(value),
 };
 
@@ -34,6 +35,7 @@ extern {
     ")" => lexer::Token::CloseParens,
     ";" => lexer::Token::Semicolon,
     ":=" => lexer::Token::Define,
+    "=" => lexer::Token::Equals,
     "func" => lexer::Token::Func,
     name => lexer::Token::Name { value: <String> },
     int => lexer::Token::IntLitteral { value: <i64> },
