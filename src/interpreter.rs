@@ -140,6 +140,7 @@ impl<C: Context> Interpreter<C> {
                 return fail(format!("Redefinition of function {}", f.name));
             }
         }
+        dbg!(&self.functions);
         self.call_function("main", &VOID)
     }
 }

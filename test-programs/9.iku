@@ -1,0 +1,8 @@
+// This tests that multiple functions can be declared and called
+func foo() {
+  print(1)
+}
+
+func main() {
+  foo(0)
+}

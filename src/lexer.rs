@@ -64,7 +64,7 @@ pub struct Location(usize);
 /// This is what our lexer produces
 pub type Span = Result<(Location, Token, Location), LexError>;
 
-const SIMPLE_MATCH_STRINGS: [&str; 8] = [r"^\{", r"^\}", r"^\(", r"^\)", r"^;", r"^:=", r"^=", r"func"];
+const SIMPLE_MATCH_STRINGS: [&str; 8] = [r"^\{", r"^\}", r"^\(", r"^\)", r"^;", r"^:=", r"^=", r"^func"];
 const SIMPLE_MATCH_LENGTHS: [usize; 8] = [1, 1, 1, 1, 1, 2, 1, 4];
 const SIMPLE_MATCH_TOKENS: [Token; 8] = [
     Token::OpenBrace,
