@@ -49,11 +49,103 @@ fn fail<T, S: Into<String>>(message: S) -> InterpreterResult<T> {
     })
 }
 
+#[derive(Debug)]
+struct Scope {
+    // If a scope is nested, then it has access to its parent scopes,
+    // otherwise it's detached from those scopes. When calling a function,
+    // that function has a completely new scope, whereas an if statement has
+    // access to the surrounding scope.
+    nested: bool,
+    // The variable definitions in this specific scope
+    vars: HashMap<String, Litteral>,
+}
+
+impl Scope {
+    fn new(nested: bool) -> Self {
+        Scope {
+            nested,
+            vars: HashMap::new(),
+        }
+    }
+
+    // Try and access a variable in this specific scope
+    fn get(&self, name: &str) -> Option<&Litteral> {
+        self.vars.get(name)
+    }
+
+    // Insert a new variable, or replace an existing one
+    fn insert<S: Into<String>>(&mut self, name: S, value: Litteral) {
+        self.vars.insert(name.into(), value);
+    }
+}
+
+// This allows us to handle lexical scoping
+#[derive(Debug)]
+struct Scopes {
+    scopes: Vec<Scope>,
+}
+
+impl Scopes {
+    fn new() -> Self {
+        Scopes { scopes: Vec::new() }
+    }
+
+    // Enter a new scope
+    fn enter(&mut self, nested: bool) {
+        self.scopes.push(Scope::new(nested));
+    }
+
+    // Exit a scope
+    fn exit(&mut self) {
+        self.scopes.pop();
+    }
+
+    // Get the value of a variable
+    fn get(&self, name: &str) -> Option<&Litteral> {
+        let mut res = None;
+        for scope in self.scopes.iter().rev() {
+            let found = scope.get(name);
+            if found.is_some() {
+                res = found;
+                break;
+            }
+            if !scope.nested {
+                break;
+            }
+        }
+        res
+    }
+
+    // Get the value of a variable
+    // Returns whether or not we managed to find a variable to set.
+    fn set<S: Into<String>>(&mut self, name: S, value: Litteral) -> bool {
+        let name = name.into();
+        for scope in self.scopes.iter_mut().rev() {
+            if scope.get(&name).is_some() {
+                scope.insert(name, value);
+                return true;
+            }
+            if !scope.nested {
+                break;
+            }
+        }
+        false
+    }
+
+    // Create a new variable in the current scope
+    // This panics if no scopes have been created
+    fn create<S: Into<String>>(&mut self, name: S, value: Litteral) {
+        let name = name.into();
+        println!("Creating {} {:?}", name.clone(), &value);
+        self.scopes.last_mut().unwrap().insert(name, value);
+    }
+}
+
 /// Represents an Interpreter holding context allowing it to function
 struct Interpreter<C> {
     ctx: C,
-    // A collection of variables defined in the main function
-    vars: HashMap<String, Litteral>,
+    // This allows us to implement lexical scoping
+    scopes: Scopes,
     // Keeping track of functions by their name
     functions: HashMap<String, Function>,
 }
@@ -62,7 +154,7 @@ impl<C: Context> Interpreter<C> {
     fn new(ctx: C) -> Self {
         Interpreter {
             ctx,
-            vars: HashMap::new(),
+            scopes: Scopes::new(),
             functions: HashMap::new(),
         }
     }
@@ -77,52 +169,66 @@ impl<C: Context> Interpreter<C> {
     }
 
     fn read_name(&mut self, name: &str) -> InterpreterResult<&Litteral> {
-        self.vars
+        dbg!((name, &self.scopes, self.scopes.get(name)));
+        self.scopes
             .get(name)
             .ok_or(format!("Trying to use undefined variable {}", name).into())
     }
 
     fn eval_expr(&mut self, e: &Expr) -> InterpreterResult<Litteral> {
         match e {
-            Expr::Call(name, e) => {
-                let inside = self.eval_expr(e)?;
-                match name.as_ref() {
-                    "print" => {
-                        self.print_litteral(&inside);
-                        Ok(inside)
-                    }
-                    _ => fail(format!("Trying to call unknown function {}", name)),
+            Expr::Call(name, args) => {
+                let mut litterals: Vec<Litteral> = Vec::new();
+                for a in args {
+                    litterals.push(self.eval_expr(a)?);
                 }
+                self.call_function(name, &litterals)
             }
             Expr::Litt(l) => Ok(l.clone()),
             Expr::Name(n) => Ok(self.read_name(n)?.clone()),
             Expr::Declare(name, e) => {
                 let result = self.eval_expr(e)?;
-                self.vars.insert(name.clone(), result.clone());
+                self.scopes.create(name, result.clone());
                 Ok(result)
             }
             Expr::Assign(name, e) => {
                 let result = self.eval_expr(e)?;
-                if self.vars.insert(name.clone(), result.clone()).is_none() {
-                    fail(format!("Trying to assign to undeclared variable {}", name))
-                } else {
+                if self.scopes.set(name, result.clone()) {
                     Ok(result)
+                } else {
+                    fail(format!("Trying to assign to undeclared variable {}", name))
                 }
             }
         }
     }
 
-    fn call_function(&mut self, name: &str, arg: &Litteral) -> InterpreterResult<Litteral> {
+    fn call_function(&mut self, name: &str, args: &[Litteral]) -> InterpreterResult<Litteral> {
+        self.scopes.enter(false);
         match name {
             "print" => {
+                let arg = args
+                    .get(0)
+                    .ok_or(String::from("Not enough arguments to print"))?;
                 self.print_litteral(arg);
+                self.scopes.exit();
                 return Ok(VOID);
             }
             _ => {}
         };
-        match self.functions.get(name) {
+        let res = match self.functions.get(name) {
             None => fail(format!("Trying to call undefined function {}", name)),
             Some(f) => {
+                if args.len() != f.args.len() {
+                    return fail(format!(
+                        "Incorrect number of arguments to function {}\n.Expected {}, but got {}",
+                        f.name,
+                        f.args.len(),
+                        args.len()
+                    ));
+                };
+                for i in 0..args.len() {
+                    self.scopes.create(f.args[i].clone(), args[i].clone());
+                }
                 let mut res = VOID;
                 // We need to clone, because Rust doesn't know that evaluation
                 // won't change the contents of f
@@ -131,7 +237,9 @@ impl<C: Context> Interpreter<C> {
                 }
                 Ok(res)
             }
-        }
+        };
+        self.scopes.exit();
+        res
     }
 
     fn interpret(&mut self, ast: &AST) -> InterpreterResult<Litteral> {
@@ -140,8 +248,7 @@ impl<C: Context> Interpreter<C> {
                 return fail(format!("Redefinition of function {}", f.name));
             }
         }
-        dbg!(&self.functions);
-        self.call_function("main", &VOID)
+        self.call_function("main", &[])
     }
 }
 

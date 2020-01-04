@@ -1,0 +1,8 @@
+func foo(x, y) {
+  print(x)
+  print(y)
+}
+
+func main() {
+  foo(1, 2)
+}

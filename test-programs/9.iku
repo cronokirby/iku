@@ -4,5 +4,5 @@ func foo() {
 }
 
 func main() {
-  foo(0)
+  foo()
 }

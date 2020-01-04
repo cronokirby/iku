@@ -21,7 +21,7 @@ pub enum Litteral {
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
     /// Call a function by name, with arguments expression
-    Call(String, Box<Expr>),
+    Call(String, Vec<Expr>),
     /// Represents the use of a litteral as an expression
     Litt(Litteral),
     /// A variable declaration, like `x := 2`
@@ -39,6 +39,8 @@ pub enum Expr {
 pub struct Function {
     /// The name we can use to call the function
     pub name: String,
+    /// The named arguments this function accepts
+    pub args: Vec<String>,
     /// The series of expressions making up the body of this function
     pub body: Vec<Expr>,
 }
