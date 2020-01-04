@@ -40,6 +40,14 @@ impl From<String> for InterpreterError {
     }
 }
 
+impl<'a> From<&'a str> for InterpreterError {
+    fn from(message: &'a str) -> Self {
+        InterpreterError {
+            message: String::from(message),
+        }
+    }
+}
+
 /// A wrapper type for results that fail in an interpreter
 pub type InterpreterResult<T> = Result<T, InterpreterError>;
 
@@ -136,7 +144,6 @@ impl Scopes {
     // This panics if no scopes have been created
     fn create<S: Into<String>>(&mut self, name: S, value: Litteral) {
         let name = name.into();
-        println!("Creating {} {:?}", name.clone(), &value);
         self.scopes.last_mut().unwrap().insert(name, value);
     }
 }
@@ -169,10 +176,9 @@ impl<C: Context> Interpreter<C> {
     }
 
     fn read_name(&mut self, name: &str) -> InterpreterResult<&Litteral> {
-        dbg!((name, &self.scopes, self.scopes.get(name)));
         self.scopes
             .get(name)
-            .ok_or(format!("Trying to use undefined variable {}", name).into())
+            .ok_or_else(|| format!("Trying to use undefined variable {}", name).into())
     }
 
     fn eval_expr(&mut self, e: &Expr) -> InterpreterResult<Litteral> {
@@ -204,16 +210,11 @@ impl<C: Context> Interpreter<C> {
 
     fn call_function(&mut self, name: &str, args: &[Litteral]) -> InterpreterResult<Litteral> {
         self.scopes.enter(false);
-        match name {
-            "print" => {
-                let arg = args
-                    .get(0)
-                    .ok_or(String::from("Not enough arguments to print"))?;
-                self.print_litteral(arg);
-                self.scopes.exit();
-                return Ok(VOID);
-            }
-            _ => {}
+        if name == "print" {
+            let arg = args.get(0).ok_or("Not enough arguments to print")?;
+            self.print_litteral(arg);
+            self.scopes.exit();
+            return Ok(VOID);
         };
         let res = match self.functions.get(name) {
             None => fail(format!("Trying to call undefined function {}", name)),
@@ -226,8 +227,8 @@ impl<C: Context> Interpreter<C> {
                         args.len()
                     ));
                 };
-                for i in 0..args.len() {
-                    self.scopes.create(f.args[i].clone(), args[i].clone());
+                for (i, arg) in args.iter().enumerate() {
+                    self.scopes.create(f.args[i].clone(), arg.clone());
                 }
                 let mut res = VOID;
                 // We need to clone, because Rust doesn't know that evaluation

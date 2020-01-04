@@ -129,7 +129,7 @@ impl<'d> Lexer<'d> {
             // we should insert semicolons at this point in the lexing process,
             // then we create a semicolon token. This will trait multiple newlines
             // as a single semicolon.
-            if self.can_insert_semi && mat.as_str().contains("\n") {
+            if self.can_insert_semi && mat.as_str().contains('\n') {
                 return Some(Ok((start, Token::Semicolon, end)));
             }
         }
