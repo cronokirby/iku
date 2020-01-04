@@ -6,3 +6,4 @@
 - Allow single line comments
 - Allow declaration and use of variables
 - Allow the declaration and use of multiple functions
+- Add function parameters
