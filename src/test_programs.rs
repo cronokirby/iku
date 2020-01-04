@@ -146,9 +146,12 @@ fn test_prog_7() {
                 Box::new(Expr::Litt(Litteral::I64(2))),
             )),
         ),
+        Expr::Call("print".into(), Box::new(Expr::Name("x".into()))),
+        Expr::Call("print".into(), Box::new(Expr::Name("y".into()))),
+        Expr::Call("print".into(), Box::new(Expr::Name("z".into()))),
     ]);
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
-    assert_eq!(&interpreted, "");
+    assert_eq!(&interpreted, "2\n2\n2\n");
 }

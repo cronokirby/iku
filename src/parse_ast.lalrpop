@@ -15,6 +15,7 @@ Expr: Expr = {
   <value:name> "(" <e:Expr> ")" => Expr::Call(value, Box::new(e)),
   <l:Litteral> => Expr::Litt(l),
   <value:name> ":=" <e:Expr> => Expr::Declare(value, Box::new(e)),
+  <value:name> => Expr::Name(value),
 };
 
 Litteral: Litteral = {

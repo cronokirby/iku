@@ -26,6 +26,8 @@ pub enum Expr {
     Litt(Litteral),
     /// A variable declaration, like `x := 2`
     Declare(String, Box<Expr>),
+    /// A reference to a variable name
+    Name(String),
 }
 
 /// Represents the full abstract syntax tree of an Iku program.

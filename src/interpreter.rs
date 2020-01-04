@@ -30,6 +30,12 @@ pub struct InterpreterError {
     message: String,
 }
 
+impl From<String> for InterpreterError {
+    fn from(message: String) -> Self {
+        InterpreterError { message }
+    }
+}
+
 /// A wrapper type for results that fail in an interpreter
 pub type InterpreterResult<T> = Result<T, InterpreterError>;
 
@@ -57,6 +63,12 @@ impl<C: Context> Interpreter<C> {
         }
     }
 
+    fn read_name(&mut self, name: &str) -> InterpreterResult<&Litteral> {
+        self.vars
+            .get(name)
+            .ok_or(format!("Trying to read undefined name {}", name).into())
+    }
+
     fn eval_expr(&mut self, e: &Expr) -> InterpreterResult<Litteral> {
         match e {
             Expr::Call(name, e) => {
@@ -70,6 +82,7 @@ impl<C: Context> Interpreter<C> {
                 }
             }
             Expr::Litt(l) => Ok(l.clone()),
+            Expr::Name(n) => Ok(self.read_name(n)?.clone()),
             Expr::Declare(name, e) => {
                 let result = self.eval_expr(e)?;
                 self.vars.insert(name.clone(), result.clone());
