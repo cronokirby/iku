@@ -13,8 +13,12 @@ Exprs: Vec<Expr> = {
 
 Expr: Expr = {
   <value:name> "(" <e:Expr> ")" => Expr::Call(value, Box::new(e)),
-  <value:int> => Expr::I32(value),
-  <value:string> => Expr::Str(value),
+  <l:Litteral> => Expr::Litt(l),
+};
+
+Litteral: Litteral = {
+  <value:int> => Litteral::I64(value),
+  <value:string> => Litteral::Str(value),
 };
 
 extern {
@@ -29,7 +33,7 @@ extern {
     ";" => lexer::Token::Semicolon,
     "func" => lexer::Token::Func,
     name => lexer::Token::Name { value: <String> },
-    int => lexer::Token::IntLitteral { value: <i32> },
+    int => lexer::Token::IntLitteral { value: <i64> },
     string => lexer::Token::StringLitteral { value: <String> }
   }
 }

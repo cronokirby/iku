@@ -33,7 +33,7 @@ fn test_prog_1() {
     let res = ASTParser::new().parse(lexer);
     let ast = AST::FuncMain(vec![Expr::Call(
         String::from("print"),
-        Box::new(Expr::I32(2)),
+        Box::new(Expr::Litt(Litteral::I64(2))),
     )]);
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
@@ -47,7 +47,7 @@ fn test_prog_2() {
     let res = ASTParser::new().parse(lexer);
     let ast = AST::FuncMain(vec![Expr::Call(
         String::from("print"),
-        Box::new(Expr::I32(-2)),
+        Box::new(Expr::Litt(Litteral::I64(-2))),
     )]);
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
@@ -64,7 +64,7 @@ fn test_prog_3() {
     let litt = String::from(PROG_3_LITT);
     let ast = AST::FuncMain(vec![Expr::Call(
         String::from("print"),
-        Box::new(Expr::Str(litt)),
+        Box::new(Expr::Litt(Litteral::Str(litt))),
     )]);
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
@@ -77,8 +77,14 @@ fn test_prog_4() {
     let lexer = Lexer::new(PROG_4);
     let res = ASTParser::new().parse(lexer);
     let ast = AST::FuncMain(vec![
-        Expr::Call(String::from("print"), Box::new(Expr::I32(1))),
-        Expr::Call(String::from("print"), Box::new(Expr::I32(2))),
+        Expr::Call(
+            String::from("print"),
+            Box::new(Expr::Litt(Litteral::I64(1))),
+        ),
+        Expr::Call(
+            String::from("print"),
+            Box::new(Expr::Litt(Litteral::I64(2))),
+        ),
     ]);
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
@@ -91,8 +97,14 @@ fn test_prog_5() {
     let lexer = Lexer::new(PROG_5);
     let res = ASTParser::new().parse(lexer);
     let ast = AST::FuncMain(vec![
-        Expr::Call(String::from("print"), Box::new(Expr::I32(1))),
-        Expr::Call(String::from("print"), Box::new(Expr::I32(2))),
+        Expr::Call(
+            String::from("print"),
+            Box::new(Expr::Litt(Litteral::I64(1))),
+        ),
+        Expr::Call(
+            String::from("print"),
+            Box::new(Expr::Litt(Litteral::I64(2))),
+        ),
     ]);
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
@@ -105,8 +117,14 @@ fn test_prog_6() {
     let lexer = Lexer::new(PROG_6);
     let res = ASTParser::new().parse(lexer);
     let ast = AST::FuncMain(vec![
-        Expr::Call(String::from("print"), Box::new(Expr::I32(6))),
-        Expr::Call(String::from("print"), Box::new(Expr::I32(6))),
+        Expr::Call(
+            String::from("print"),
+            Box::new(Expr::Litt(Litteral::I64(6))),
+        ),
+        Expr::Call(
+            String::from("print"),
+            Box::new(Expr::Litt(Litteral::I64(6))),
+        ),
     ]);
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();

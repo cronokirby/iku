@@ -14,7 +14,7 @@ pub enum Token {
     Semicolon,
     Func,
     StringLitteral { value: String },
-    IntLitteral { value: i32 },
+    IntLitteral { value: i64 },
     Name { value: String },
 }
 
@@ -150,7 +150,7 @@ impl<'d> Lexer<'d> {
         }
         if let Some(mat) = self.int_litteral_matcher.find(current_data) {
             let matched_string = mat.as_str();
-            let value = i32::from_str(matched_string).unwrap();
+            let value = i64::from_str(matched_string).unwrap();
             let matched_token = Token::IntLitteral { value };
             let start = Location(self.pos);
             self.pos += matched_string.len();

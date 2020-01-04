@@ -44,37 +44,36 @@ struct Interpreter<C> {
 }
 
 impl<C: Context> Interpreter<C> {
-    fn print_expr(&mut self, e: &Expr) {
-        match e {
-            Expr::I32(i) => self.ctx.print(&format!("{}\n", i)),
-            Expr::Str(s) => {
+    fn print_litteral(&mut self, l: &Litteral) {
+        match l {
+            Litteral::I64(i) => self.ctx.print(&format!("{}\n", i)),
+            Litteral::Str(s) => {
                 self.ctx.print(s);
                 self.ctx.print("\n");
             }
-            Expr::Call(_, _) => panic!("Trying to show unreduced expression!"),
         }
     }
 
-    fn eval_expr(&mut self, e: &Expr) -> InterpreterResult<Expr> {
+    fn eval_expr(&mut self, e: &Expr) -> InterpreterResult<Litteral> {
         match e {
             Expr::Call(name, e) => {
                 let inside = self.eval_expr(e)?;
                 match name.as_ref() {
                     "print" => {
-                        self.print_expr(&inside);
+                        self.print_litteral(&inside);
                         Ok(inside)
                     }
                     _ => fail(format!("Trying to call unknown function {}", name)),
                 }
             }
-            other => Ok(other.clone()),
+            Expr::Litt(l) => Ok(l.clone()),
         }
     }
 
-    fn interpret(&mut self, ast: &AST) -> InterpreterResult<Expr> {
+    fn interpret(&mut self, ast: &AST) -> InterpreterResult<Litteral> {
         match ast {
             AST::FuncMain(exprs) => {
-                let mut res = Expr::I32(0);
+                let mut res = Litteral::I64(0);
                 for e in exprs {
                     res = self.eval_expr(e)?;
                 }
@@ -85,7 +84,7 @@ impl<C: Context> Interpreter<C> {
 }
 
 /// Interpret a program given some context for the interpreter to use.
-pub fn interpret<C: Context>(ctx: C, ast: &AST) -> InterpreterResult<Expr> {
+pub fn interpret<C: Context>(ctx: C, ast: &AST) -> InterpreterResult<Litteral> {
     let mut interpreter = Interpreter { ctx };
     interpreter.interpret(ast)
 }
