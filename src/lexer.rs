@@ -76,8 +76,8 @@ pub struct Lexer<'d> {
     pos: usize,
     can_insert_semi: bool,
     simple_matchers: RegexSet,
-    /// Matches any amount of whitespace
-    whitespace_matcher: Regex,
+    // This allows us to skip various whitespace or comments
+    skip_matcher: Regex,
     string_litteral_matcher: Regex,
     int_litteral_matcher: Regex,
     name_matcher: Regex,
@@ -86,7 +86,7 @@ pub struct Lexer<'d> {
 impl<'d> Lexer<'d> {
     pub fn new(data: &'d str) -> Lexer {
         let simple_matchers = RegexSet::new(&SIMPLE_MATCH_STRINGS).unwrap();
-        let whitespace_matcher = Regex::new(r"^\s+").unwrap();
+        let skip_matcher = Regex::new(r"^((//[^\n]*)|\s)+").unwrap();
         let int_litteral_matcher = Regex::new(r"^-?[0-9]+").unwrap();
         let string_litteral_matcher = Regex::new(r#"^"([^"]*)""#).unwrap();
         let name_matcher = Regex::new(r"^[a-z]\w*").unwrap();
@@ -95,7 +95,7 @@ impl<'d> Lexer<'d> {
             pos: 0,
             can_insert_semi: false,
             simple_matchers,
-            whitespace_matcher,
+            skip_matcher,
             string_litteral_matcher,
             int_litteral_matcher,
             name_matcher,
@@ -104,7 +104,7 @@ impl<'d> Lexer<'d> {
 
     // This is like next, but next wants to modify the state of can_insert_semi
     fn advance(&mut self) -> Option<Span> {
-        while let Some(mat) = self.whitespace_matcher.find(&self.data[self.pos..]) {
+        while let Some(mat) = self.skip_matcher.find(&self.data[self.pos..]) {
             let start = Location(self.pos);
             self.pos += mat.end() - mat.start();
             let end = Location(self.pos);

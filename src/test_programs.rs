@@ -8,6 +8,7 @@ const PROG_2: &'static str = include_str!("../test-programs/2.iku");
 const PROG_3: &'static str = include_str!("../test-programs/3.iku");
 const PROG_4: &'static str = include_str!("../test-programs/4.iku");
 const PROG_5: &'static str = include_str!("../test-programs/5.iku");
+const PROG_6: &'static str = include_str!("../test-programs/6.iku");
 
 #[derive(Debug)]
 struct FakeContext<'a> {
@@ -30,7 +31,10 @@ impl<'a> Context for FakeContext<'a> {
 fn test_prog_1() {
     let lexer = Lexer::new(PROG_1);
     let res = ASTParser::new().parse(lexer);
-    let ast = AST::FuncMain(vec![Expr::Call(String::from("print"), Box::new(Expr::I32(2)))]);
+    let ast = AST::FuncMain(vec![Expr::Call(
+        String::from("print"),
+        Box::new(Expr::I32(2)),
+    )]);
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
@@ -41,7 +45,10 @@ fn test_prog_1() {
 fn test_prog_2() {
     let lexer = Lexer::new(PROG_2);
     let res = ASTParser::new().parse(lexer);
-    let ast = AST::FuncMain(vec![Expr::Call(String::from("print"), Box::new(Expr::I32(-2)))]);
+    let ast = AST::FuncMain(vec![Expr::Call(
+        String::from("print"),
+        Box::new(Expr::I32(-2)),
+    )]);
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
@@ -55,7 +62,10 @@ fn test_prog_3() {
     let lexer = Lexer::new(PROG_3);
     let res = ASTParser::new().parse(lexer);
     let litt = String::from(PROG_3_LITT);
-    let ast = AST::FuncMain(vec![Expr::Call(String::from("print"), Box::new(Expr::Str(litt)))]);
+    let ast = AST::FuncMain(vec![Expr::Call(
+        String::from("print"),
+        Box::new(Expr::Str(litt)),
+    )]);
     assert_eq!(res.as_ref(), Ok(&ast));
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
@@ -88,4 +98,18 @@ fn test_prog_5() {
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "1\n2\n");
+}
+
+#[test]
+fn test_prog_6() {
+    let lexer = Lexer::new(PROG_6);
+    let res = ASTParser::new().parse(lexer);
+    let ast = AST::FuncMain(vec![
+        Expr::Call(String::from("print"), Box::new(Expr::I32(6))),
+        Expr::Call(String::from("print"), Box::new(Expr::I32(6))),
+    ]);
+    assert_eq!(res.as_ref(), Ok(&ast));
+    let mut interpreted = String::new();
+    assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
+    assert_eq!(&interpreted, "6\n6\n");
 }
