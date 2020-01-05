@@ -10,6 +10,8 @@ pub enum Litteral {
     /// Right now all string litterals are 64 bit signed integers,
     /// but we might want litterals to be big nums at some point.
     I64(i64),
+    /// A boolean litteral
+    Bool(bool),
 }
 
 /// Represents an expression in the Iku language.

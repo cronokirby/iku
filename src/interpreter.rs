@@ -172,6 +172,7 @@ impl<C: Context> Interpreter<C> {
                 self.ctx.print(s);
                 self.ctx.print("\n");
             }
+            Litteral::Bool(s) => self.ctx.print(&format!("{}\n", s)),
         }
     }
 

@@ -37,6 +37,7 @@ Expr: Expr = {
 Litteral: Litteral = {
   <value:int> => Litteral::I64(value),
   <value:string> => Litteral::Str(value),
+  <value:bool> => Litteral::Bool(value),
 };
 
 extern {
@@ -55,6 +56,7 @@ extern {
     "func" => lexer::Token::Func,
     name => lexer::Token::Name { value: <String> },
     int => lexer::Token::IntLitteral { value: <i64> },
-    string => lexer::Token::StringLitteral { value: <String> }
+    string => lexer::Token::StringLitteral { value: <String> },
+    bool => lexer::Token::BoolLitteral { value: <bool> },
   }
 }
