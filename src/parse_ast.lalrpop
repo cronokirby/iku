@@ -33,7 +33,7 @@ Expr: Expr = {
 }
 
 Expr1: Expr = {
-  <left:Expr1> "==" <right:Expr2> => Expr::BinOp(Op::Equal, Box::new(left), Box::new(right)),
+  <left:Expr2> "==" <right:Expr2> => Expr::BinOp(Op::Equal, Box::new(left), Box::new(right)),
   Expr2,
 };
 
