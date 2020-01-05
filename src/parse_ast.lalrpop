@@ -27,12 +27,22 @@ Block: Vec<Expr> = {
 };
 
 Expr: Expr = {
-  <value:name> "(" <args:Comma<Expr>> ")" => Expr::Call(value, args),
-  <l:Litteral> => Expr::Litt(l),
   <value:name> ":=" <e:Expr> => Expr::Declare(value, Box::new(e)),
   <value:name> "=" <e:Expr> => Expr::Assign(value, Box::new(e)),
+  Expr1
+}
+
+Expr1: Expr = {
+  <left:Expr1> "==" <right:Expr2> => Expr::BinOp(Op::Equal, Box::new(left), Box::new(right)),
+  Expr2,
+};
+
+Expr2: Expr = {
+  <value:name> "(" <args:Comma<Expr>> ")" => Expr::Call(value, args),
+  <l:Litteral> => Expr::Litt(l),
   <value:name> => Expr::Name(value),
   <Block> => Expr::Block(<>),
+  "(" <value:Expr> ")" => value
 };
 
 Litteral: Litteral = {
@@ -52,6 +62,7 @@ extern {
     ")" => lexer::Token::CloseParens,
     ";" => lexer::Token::Semicolon,
     ":=" => lexer::Token::Define,
+    "==" => lexer::Token::DoubleEquals,
     "=" => lexer::Token::Equals,
     "," => lexer::Token::Comma,
     "func" => lexer::Token::Func,

@@ -2,6 +2,7 @@
 
 - Add boolean litterals
 - Add scope expressions
+- Add == operator
 
 # Version 0.1.0
 

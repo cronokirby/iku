@@ -14,6 +14,16 @@ pub enum Litteral {
     Bool(bool),
 }
 
+/// Represents what kind of operations exist
+///
+/// This also includes operations that return different types, e.g. 2 == 2,
+/// which returns a boolean instead of an integer
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Op {
+    /// Check for equality with ==
+    Equal
+}
+
 /// Represents an expression in the Iku language.
 ///
 /// Expressions can be evaluated to some kind of value.
@@ -32,6 +42,7 @@ pub enum Expr {
     Assign(String, Box<Expr>),
     /// A block of expressions
     Block(Vec<Expr>),
+    BinOp(Op, Box<Expr>, Box<Expr>),
     /// A reference to a variable name
     Name(String),
 }

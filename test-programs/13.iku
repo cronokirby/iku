@@ -1,0 +1,5 @@
+// This tests that equality works
+func main() {
+  print(1 == 1)
+  print(1 == 2)
+}

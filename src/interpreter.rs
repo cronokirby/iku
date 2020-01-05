@@ -220,6 +220,14 @@ impl<C: Context> Interpreter<C> {
                 self.scopes.exit();
                 res
             }
+            Expr::BinOp(op, left, right) => {
+                let left = self.eval_expr(left)?;
+                let right = self.eval_expr(right)?;
+                let res = match op {
+                    Op::Equal => Litteral::Bool(left == right)
+                };
+                Ok(res)
+            }
         }
     }
 
