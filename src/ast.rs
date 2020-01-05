@@ -30,6 +30,8 @@ pub enum Expr {
     Declare(String, Box<Expr>),
     /// A variable assignment, like `x = 3`
     Assign(String, Box<Expr>),
+    /// A block of expressions
+    Block(Vec<Expr>),
     /// A reference to a variable name
     Name(String),
 }

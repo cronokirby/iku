@@ -1,6 +1,7 @@
 # Version 0.2.0
 
 - Add boolean litterals
+- Add scope expressions
 
 # Version 0.1.0
 

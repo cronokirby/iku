@@ -194,6 +194,7 @@ impl<'d> Iterator for Lexer<'d> {
         if let Some(Ok((_, tok, _))) = &res {
             self.can_insert_semi = match tok {
                 Token::CloseParens => true,
+                Token::CloseBrace => true,
                 Token::IntLitteral { .. } => true,
                 Token::StringLitteral { .. } => true,
                 Token::Name { .. } => true,

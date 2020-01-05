@@ -1,0 +1,12 @@
+// This program tests scope expressions
+func main() {
+  x := 2
+  // y takes the value of the shadowing x, which is 3
+  y := {
+    x := 3
+    x
+  }
+  // x is no longer shadowed, so this prints 2
+  print(x)
+  print(y)
+}

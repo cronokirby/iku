@@ -182,6 +182,14 @@ impl<C: Context> Interpreter<C> {
             .ok_or_else(|| format!("Trying to use undefined variable {}", name).into())
     }
 
+    fn eval_block(&mut self, exprs: &[Expr]) -> InterpreterResult<Litteral> {
+        let mut res = VOID;
+        for e in exprs {
+            res = self.eval_expr(e)?;
+        }
+        Ok(res)
+    }
+
     fn eval_expr(&mut self, e: &Expr) -> InterpreterResult<Litteral> {
         match e {
             Expr::Call(name, args) => {
@@ -205,6 +213,12 @@ impl<C: Context> Interpreter<C> {
                 } else {
                     fail(format!("Trying to assign to undeclared variable {}", name))
                 }
+            }
+            Expr::Block(exprs) => {
+                self.scopes.enter(true);
+                let res = self.eval_block(exprs);
+                self.scopes.exit();
+                res
             }
         }
     }
@@ -231,13 +245,10 @@ impl<C: Context> Interpreter<C> {
                 for (i, arg) in args.iter().enumerate() {
                     self.scopes.create(f.args[i].clone(), arg.clone());
                 }
-                let mut res = VOID;
                 // We need to clone, because Rust doesn't know that evaluation
                 // won't change the contents of f
-                for e in f.body.clone() {
-                    res = self.eval_expr(&e)?;
-                }
-                Ok(res)
+                let body = f.body.clone();
+                self.eval_block(&body)
             }
         };
         self.scopes.exit();

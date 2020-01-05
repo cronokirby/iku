@@ -15,7 +15,7 @@ Comma<T>: Vec<T> = {
 }
 
 pub AST: AST = {
-  <functions:Function*> => AST {<>},
+  <functions:(<Function> ";"?)*> => AST {<>},
 };
 
 Function: Function = {
@@ -32,6 +32,7 @@ Expr: Expr = {
   <value:name> ":=" <e:Expr> => Expr::Declare(value, Box::new(e)),
   <value:name> "=" <e:Expr> => Expr::Assign(value, Box::new(e)),
   <value:name> => Expr::Name(value),
+  <Block> => Expr::Block(<>),
 };
 
 Litteral: Litteral = {
