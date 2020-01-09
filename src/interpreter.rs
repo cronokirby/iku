@@ -223,10 +223,23 @@ impl<C: Context> Interpreter<C> {
             Expr::BinOp(op, left, right) => {
                 let left = self.eval_expr(left)?;
                 let right = self.eval_expr(right)?;
-                let res = match op {
-                    Op::Equal => Litteral::Bool(left == right)
-                };
-                Ok(res)
+                match op {
+                    Op::Equal => Ok(Litteral::Bool(left == right)),
+                    Op::Leq | Op::Less | Op::Geq | Op::Greater => {
+                        let (l, r) = match (left, right) {
+                            (Litteral::I64(l), Litteral::I64(r)) => Ok((l, r)),
+                            (l, r) => fail(format!("Cannot compare {:?} and {:?}", l, r)),
+                        }?;
+                        let res = match op {
+                            Op::Leq => Litteral::Bool(l <= r),
+                            Op::Less => Litteral::Bool(l < r),
+                            Op::Geq => Litteral::Bool(l >= r),
+                            Op::Greater => Litteral::Bool(l > r),
+                            _ => unreachable!(),
+                        };
+                        Ok(res)
+                    }
+                }
             }
         }
     }

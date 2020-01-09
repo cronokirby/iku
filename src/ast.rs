@@ -21,7 +21,15 @@ pub enum Litteral {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Op {
     /// Check for equality with ==
-    Equal
+    Equal,
+    /// Compare with <=
+    Leq,
+    /// Compare with <
+    Less,
+    /// Compare with >=
+    Geq,
+    /// Compare with >
+    Greater,
 }
 
 /// Represents an expression in the Iku language.

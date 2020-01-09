@@ -38,6 +38,14 @@ Expr1: Expr = {
 };
 
 Expr2: Expr = {
+  <left:Expr3> "<=" <right:Expr3> => Expr::BinOp(Op::Leq, Box::new(left), Box::new(right)),
+  <left:Expr3> "<" <right:Expr3> => Expr::BinOp(Op::Less, Box::new(left), Box::new(right)),
+  <left:Expr3> ">=" <right:Expr3> => Expr::BinOp(Op::Geq, Box::new(left), Box::new(right)),
+  <left:Expr3> ">" <right:Expr3> => Expr::BinOp(Op::Greater, Box::new(left), Box::new(right)),
+  Expr3
+};
+
+Expr3: Expr = {
   <value:name> "(" <args:Comma<Expr>> ")" => Expr::Call(value, args),
   <l:Litteral> => Expr::Litt(l),
   <value:name> => Expr::Name(value),
@@ -64,6 +72,10 @@ extern {
     ":=" => lexer::Token::Define,
     "==" => lexer::Token::DoubleEquals,
     "=" => lexer::Token::Equals,
+    "<=" => lexer::Token::LessEquals,
+    "<" => lexer::Token::Less,
+    ">" => lexer::Token::Greater,
+    ">=" => lexer::Token::GreaterEquals,
     "," => lexer::Token::Comma,
     "func" => lexer::Token::Func,
     name => lexer::Token::Name { value: <String> },
