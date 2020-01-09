@@ -29,6 +29,10 @@ pub enum Token {
     /// The , symbol
     Comma,
     Func,
+    /// The if keyword
+    If,
+    /// The else keyword
+    Else,
     BoolLitteral {
         value: bool,
     },
@@ -85,12 +89,12 @@ pub struct Location(usize);
 /// This is what our lexer produces
 pub type Span = Result<(Location, Token, Location), LexError>;
 
-const SIMPLE_MATCH_STRINGS: [&str; 16] = [
-    r"^\{", r"^\}", r"^\(", r"^\)", r"^;", r"^:=", r"^==", r"^=", r"^<=", r"^<", r"^>=", r"^>", r"^,", r"^true", r"^false",
-    r"^func",
+const SIMPLE_MATCH_STRINGS: [&str; 18] = [
+    r"^\{", r"^\}", r"^\(", r"^\)", r"^;", r"^:=", r"^==", r"^=", r"^<=", r"^<", r"^>=", r"^>",
+    r"^,", r"^true", r"^false", r"^func", r"^if", r"^else",
 ];
-const SIMPLE_MATCH_LENGTHS: [usize; 16] = [1, 1, 1, 1, 1, 2, 2, 1, 2, 1, 2, 1, 1, 4, 5, 4];
-const SIMPLE_MATCH_TOKENS: [Token; 16] = [
+const SIMPLE_MATCH_LENGTHS: [usize; 18] = [1, 1, 1, 1, 1, 2, 2, 1, 2, 1, 2, 1, 1, 4, 5, 4, 2, 4];
+const SIMPLE_MATCH_TOKENS: [Token; 18] = [
     Token::OpenBrace,
     Token::CloseBrace,
     Token::OpenParens,
@@ -107,6 +111,8 @@ const SIMPLE_MATCH_TOKENS: [Token; 16] = [
     Token::BoolLitteral { value: true },
     Token::BoolLitteral { value: false },
     Token::Func,
+    Token::If,
+    Token::Else,
 ];
 
 pub struct Lexer<'d> {

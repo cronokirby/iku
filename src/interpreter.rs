@@ -190,6 +190,51 @@ impl<C: Context> Interpreter<C> {
         Ok(res)
     }
 
+    fn eval_bin_op(&mut self, op: Op, left: &Expr, right: &Expr) -> InterpreterResult<Litteral> {
+        let left = self.eval_expr(left)?;
+        let right = self.eval_expr(right)?;
+        match op {
+            Op::Equal => Ok(Litteral::Bool(left == right)),
+            Op::Leq | Op::Less | Op::Geq | Op::Greater => {
+                let (l, r) = match (left, right) {
+                    (Litteral::I64(l), Litteral::I64(r)) => Ok((l, r)),
+                    (l, r) => fail(format!("Cannot compare {:?} and {:?}", l, r)),
+                }?;
+                let res = match op {
+                    Op::Leq => Litteral::Bool(l <= r),
+                    Op::Less => Litteral::Bool(l < r),
+                    Op::Geq => Litteral::Bool(l >= r),
+                    Op::Greater => Litteral::Bool(l > r),
+                    _ => unreachable!(),
+                };
+                Ok(res)
+            }
+        }
+    }
+
+    fn eval_if_else(
+        &mut self,
+        cond: &Expr,
+        if_part: &[Expr],
+        else_part: &[Expr],
+    ) -> InterpreterResult<Litteral> {
+        let cond = match self.eval_expr(cond)? {
+            Litteral::Bool(b) => b,
+            wrong_type => {
+                return fail(format!(
+                    "Expected boolean in condition, but got {:?}",
+                    wrong_type
+                ))
+            }
+        };
+        // Because we haven't evaluated the left and right parts, this does the right thing
+        if cond {
+            self.eval_block(if_part)
+        } else {
+            self.eval_block(else_part)
+        }
+    }
+
     fn eval_expr(&mut self, e: &Expr) -> InterpreterResult<Litteral> {
         match e {
             Expr::Call(name, args) => {
@@ -220,27 +265,8 @@ impl<C: Context> Interpreter<C> {
                 self.scopes.exit();
                 res
             }
-            Expr::BinOp(op, left, right) => {
-                let left = self.eval_expr(left)?;
-                let right = self.eval_expr(right)?;
-                match op {
-                    Op::Equal => Ok(Litteral::Bool(left == right)),
-                    Op::Leq | Op::Less | Op::Geq | Op::Greater => {
-                        let (l, r) = match (left, right) {
-                            (Litteral::I64(l), Litteral::I64(r)) => Ok((l, r)),
-                            (l, r) => fail(format!("Cannot compare {:?} and {:?}", l, r)),
-                        }?;
-                        let res = match op {
-                            Op::Leq => Litteral::Bool(l <= r),
-                            Op::Less => Litteral::Bool(l < r),
-                            Op::Geq => Litteral::Bool(l >= r),
-                            Op::Greater => Litteral::Bool(l > r),
-                            _ => unreachable!(),
-                        };
-                        Ok(res)
-                    }
-                }
-            }
+            Expr::BinOp(op, left, right) => self.eval_bin_op(*op, left, right),
+            Expr::IfElse(cond, if_part, right_part) => self.eval_if_else(cond, if_part, right_part),
         }
     }
 

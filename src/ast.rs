@@ -50,7 +50,10 @@ pub enum Expr {
     Assign(String, Box<Expr>),
     /// A block of expressions
     Block(Vec<Expr>),
+    /// A binary operation between two arguments
     BinOp(Op, Box<Expr>, Box<Expr>),
+    /// An if else expresion, like `if y { 3 } else { 4 }`
+    IfElse(Box<Expr>, Vec<Expr>, Vec<Expr>),
     /// A reference to a variable name
     Name(String),
 }

@@ -23,7 +23,14 @@ Function: Function = {
 };
 
 Block: Vec<Expr> = {
-  "{" <(<Expr> ";")*> "}"
+  "{" <v:(<Expr> ";")*> <e: Expr?> "}"=> match e {
+    None => v,
+    Some(e) => {
+      let mut v = v;
+      v.push(e);
+      v
+    }
+  }
 };
 
 Expr: Expr = {
@@ -50,8 +57,18 @@ Expr3: Expr = {
   <l:Litteral> => Expr::Litt(l),
   <value:name> => Expr::Name(value),
   <Block> => Expr::Block(<>),
-  "(" <value:Expr> ")" => value
+  <ExprIfElse>,
+  "(" <Expr> ")",
 };
+
+ExprIfElse: Expr = {
+  "if" <cond:Expr> <left:Block> "else" <right:ExprAfterElse> => Expr::IfElse(Box::new(cond), left, right),
+}
+
+ExprAfterElse: Vec<Expr> = {
+  <ExprIfElse> => vec![<>],
+  <Block>,
+}
 
 Litteral: Litteral = {
   <value:int> => Litteral::I64(value),
@@ -78,6 +95,8 @@ extern {
     ">=" => lexer::Token::GreaterEquals,
     "," => lexer::Token::Comma,
     "func" => lexer::Token::Func,
+    "if" => lexer::Token::If,
+    "else" => lexer::Token::Else,
     name => lexer::Token::Name { value: <String> },
     int => lexer::Token::IntLitteral { value: <i64> },
     string => lexer::Token::StringLitteral { value: <String> },
