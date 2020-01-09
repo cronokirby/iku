@@ -23,7 +23,7 @@ Function: Function = {
 };
 
 Block: Vec<Expr> = {
-  "{" <v:(<Expr> ";")*> <e: Expr?> "}"=> match e {
+  "{" <v:(<Expr> ";")*> <e: Expr?> "}" => match e {
     None => v,
     Some(e) => {
       let mut v = v;
@@ -62,7 +62,13 @@ Expr3: Expr = {
 };
 
 ExprIfElse: Expr = {
-  "if" <cond:Expr> <left:Block> "else" <right:ExprAfterElse> => Expr::IfElse(Box::new(cond), left, right),
+  "if" <cond:Expr> <left:Block> <right:("else" <ExprAfterElse>)?> => {
+    let right = match right {
+      None => Vec::new(),
+      Some(v) => v,
+    };
+    Expr::IfElse(Box::new(cond), left, right)
+  }
 }
 
 ExprAfterElse: Vec<Expr> = {

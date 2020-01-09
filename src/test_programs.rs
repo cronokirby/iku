@@ -18,6 +18,7 @@ const PROG_12: &'static str = include_str!("../test-programs/12.iku");
 const PROG_13: &'static str = include_str!("../test-programs/13.iku");
 const PROG_14: &'static str = include_str!("../test-programs/14.iku");
 const PROG_15: &'static str = include_str!("../test-programs/15.iku");
+const PROG_16: &'static str = include_str!("../test-programs/16.iku");
 
 #[derive(Debug)]
 struct FakeContext<'a> {
@@ -418,7 +419,6 @@ fn test_prog_14() {
 #[test]
 fn test_prog_15() {
     let lexer = Lexer::new(PROG_15);
-    dbg!(Lexer::new(PROG_15).filter(|x| x.is_ok()).map(|r| r.map(|(_, tok, _)| tok).unwrap()).collect::<Vec<_>>());
     let res = ASTParser::new().parse(lexer);
     let body = vec![
         Expr::Declare(
@@ -434,6 +434,41 @@ fn test_prog_15() {
             )),
         ),
         Expr::Call("print".into(), vec![Expr::Name("x".into())]),
+    ];
+    let ast = AST {
+        functions: vec![Function {
+            name: "main".into(),
+            args: vec![],
+            body,
+        }],
+    };
+    assert_eq!(res.as_ref(), Ok(&ast));
+    let mut interpreted = String::new();
+    assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
+    assert_eq!(&interpreted, "2\n");
+}
+
+#[test]
+fn test_prog_16() {
+    let lexer = Lexer::new(PROG_16);
+    let res = ASTParser::new().parse(lexer);
+    let body = vec![
+        Expr::IfElse(
+            Box::new(Expr::Litt(Litteral::Bool(false))),
+            vec![Expr::Call(
+                "print".into(),
+                vec![Expr::Litt(Litteral::I64(1))],
+            )],
+            vec![],
+        ),
+        Expr::IfElse(
+            Box::new(Expr::Litt(Litteral::Bool(true))),
+            vec![Expr::Call(
+                "print".into(),
+                vec![Expr::Litt(Litteral::I64(2))],
+            )],
+            vec![],
+        ),
     ];
     let ast = AST {
         functions: vec![Function {

@@ -3,6 +3,7 @@
 - Add boolean litterals
 - Add scope expressions
 - Add == operator
+- Add if else expressions
 
 # Version 0.1.0
 
