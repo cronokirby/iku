@@ -34,6 +34,10 @@ pub enum Op {
     Add,
     /// Subtraction
     Sub,
+    /// Multiplication
+    Mul,
+    /// Division
+    Div
 }
 
 /// Represents an expression in the Iku language.

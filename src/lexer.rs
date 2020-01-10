@@ -32,6 +32,10 @@ pub enum Token {
     Plus,
     /// The - symbol
     Minus,
+    /// The * symbol
+    Asterisk,
+    /// The / symbol
+    Slash,
     Func,
     /// The if keyword
     If,
@@ -93,12 +97,12 @@ pub struct Location(usize);
 /// This is what our lexer produces
 pub type Span = Result<(Location, Token, Location), LexError>;
 
-const SIMPLE_MATCH_STRINGS: [&str; 20] = [
+const SIMPLE_MATCH_STRINGS: [&str; 22] = [
     r"^\{", r"^\}", r"^\(", r"^\)", r"^;", r"^:=", r"^==", r"^=", r"^<=", r"^<", r"^>=", r"^>",
-    r"^,", r"^\+", r"^-\D", r"^true", r"^false", r"^func", r"^if", r"^else",
+    r"^,", r"^\+", r"^-\D", r"^\*", r"^/", r"^true", r"^false", r"^func", r"^if", r"^else",
 ];
-const SIMPLE_MATCH_LENGTHS: [usize; 20] = [1, 1, 1, 1, 1, 2, 2, 1, 2, 1, 2, 1, 1, 1, 1, 4, 5, 4, 2, 4];
-const SIMPLE_MATCH_TOKENS: [Token; 20] = [
+const SIMPLE_MATCH_LENGTHS: [usize; 22] = [1, 1, 1, 1, 1, 2, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 4, 5, 4, 2, 4];
+const SIMPLE_MATCH_TOKENS: [Token; 22] = [
     Token::OpenBrace,
     Token::CloseBrace,
     Token::OpenParens,
@@ -114,6 +118,8 @@ const SIMPLE_MATCH_TOKENS: [Token; 20] = [
     Token::Comma,
     Token::Plus,
     Token::Minus,
+    Token::Asterisk,
+    Token::Slash,
     Token::BoolLitteral { value: true },
     Token::BoolLitteral { value: false },
     Token::Func,
