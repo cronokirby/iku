@@ -28,6 +28,10 @@ pub enum Token {
     Greater,
     /// The , symbol
     Comma,
+    /// The + symbol
+    Plus,
+    /// The - symbol
+    Minus,
     Func,
     /// The if keyword
     If,
@@ -89,12 +93,12 @@ pub struct Location(usize);
 /// This is what our lexer produces
 pub type Span = Result<(Location, Token, Location), LexError>;
 
-const SIMPLE_MATCH_STRINGS: [&str; 18] = [
+const SIMPLE_MATCH_STRINGS: [&str; 20] = [
     r"^\{", r"^\}", r"^\(", r"^\)", r"^;", r"^:=", r"^==", r"^=", r"^<=", r"^<", r"^>=", r"^>",
-    r"^,", r"^true", r"^false", r"^func", r"^if", r"^else",
+    r"^,", r"^\+", r"^-\D", r"^true", r"^false", r"^func", r"^if", r"^else",
 ];
-const SIMPLE_MATCH_LENGTHS: [usize; 18] = [1, 1, 1, 1, 1, 2, 2, 1, 2, 1, 2, 1, 1, 4, 5, 4, 2, 4];
-const SIMPLE_MATCH_TOKENS: [Token; 18] = [
+const SIMPLE_MATCH_LENGTHS: [usize; 20] = [1, 1, 1, 1, 1, 2, 2, 1, 2, 1, 2, 1, 1, 1, 1, 4, 5, 4, 2, 4];
+const SIMPLE_MATCH_TOKENS: [Token; 20] = [
     Token::OpenBrace,
     Token::CloseBrace,
     Token::OpenParens,
@@ -108,6 +112,8 @@ const SIMPLE_MATCH_TOKENS: [Token; 18] = [
     Token::GreaterEquals,
     Token::Greater,
     Token::Comma,
+    Token::Plus,
+    Token::Minus,
     Token::BoolLitteral { value: true },
     Token::BoolLitteral { value: false },
     Token::Func,

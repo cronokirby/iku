@@ -30,6 +30,10 @@ pub enum Op {
     Geq,
     /// Compare with >
     Greater,
+    /// Addition
+    Add,
+    /// Subtraction
+    Sub,
 }
 
 /// Represents an expression in the Iku language.
