@@ -61,6 +61,7 @@ Expr3: Expr = {
 Expr4: Expr = {
   <left:Expr4> "*" <right:Expr5> => Expr::BinOp(Op::Mul, Box::new(left), Box::new(right)),
   <left:Expr4> "/" <right:Expr5> => Expr::BinOp(Op::Div, Box::new(left), Box::new(right)),
+  <left:Expr4> "%" <right:Expr5> => Expr::BinOp(Op::Mod, Box::new(left), Box::new(right)),
   Expr5,
 };
 
@@ -116,6 +117,7 @@ extern {
     "-" => lexer::Token::Minus,
     "*" => lexer::Token::Asterisk,
     "/" => lexer::Token::Slash,
+    "%" => lexer::Token::Percent,
     "func" => lexer::Token::Func,
     "if" => lexer::Token::If,
     "else" => lexer::Token::Else,

@@ -196,7 +196,7 @@ impl<C: Context> Interpreter<C> {
         match op {
             Op::Equal => Ok(Litteral::Bool(left == right)),
             // All of these only work on ints
-            Op::Leq | Op::Less | Op::Geq | Op::Greater | Op::Add | Op::Sub | Op::Mul | Op::Div => {
+            Op::Leq | Op::Less | Op::Geq | Op::Greater | Op::Add | Op::Sub | Op::Mul | Op::Div | Op::Mod => {
                 let (l, r) = match (left, right) {
                     (Litteral::I64(l), Litteral::I64(r)) => Ok((l, r)),
                     (l, r) => fail(format!("Cannot compare {:?} and {:?}", l, r)),
@@ -210,6 +210,7 @@ impl<C: Context> Interpreter<C> {
                     Op::Sub => Litteral::I64(l - r),
                     Op::Mul => Litteral::I64(l * r),
                     Op::Div => Litteral::I64(l / r),
+                    Op::Mod => Litteral::I64(l % r),
                     _ => unreachable!(),
                 };
                 Ok(res)

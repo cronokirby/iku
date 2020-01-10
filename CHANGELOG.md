@@ -5,6 +5,7 @@
 - Add == operator
 - Add >, >=, <, <= operators
 - Add if else expressions
+- Add +, -, *, /, and % operators (for integers)
 
 # Version 0.1.0
 

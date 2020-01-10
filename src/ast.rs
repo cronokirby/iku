@@ -37,7 +37,9 @@ pub enum Op {
     /// Multiplication
     Mul,
     /// Division
-    Div
+    Div,
+    /// Modulo
+    Mod
 }
 
 /// Represents an expression in the Iku language.
