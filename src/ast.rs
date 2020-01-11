@@ -22,6 +22,8 @@ pub enum Litteral {
 pub enum Op {
     /// Check for equality with ==
     Equal,
+    /// Check for inequality with !=
+    NotEqual,
     /// Compare with <=
     Leq,
     /// Compare with <

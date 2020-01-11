@@ -195,6 +195,7 @@ impl<C: Context> Interpreter<C> {
         let right = self.eval_expr(right)?;
         match op {
             Op::Equal => Ok(Litteral::Bool(left == right)),
+            Op::NotEqual => Ok(Litteral::Bool(left != right)),
             // All of these only work on ints
             Op::Leq | Op::Less | Op::Geq | Op::Greater | Op::Add | Op::Sub | Op::Mul | Op::Div | Op::Mod => {
                 let (l, r) = match (left, right) {

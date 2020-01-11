@@ -18,6 +18,8 @@ pub enum Token {
     Equals,
     /// The == symbol
     DoubleEquals,
+    /// The != symbol
+    NotEquals,
     /// The <= symbol
     LessEquals,
     /// The < symbol
@@ -99,12 +101,12 @@ pub struct Location(usize);
 /// This is what our lexer produces
 pub type Span = Result<(Location, Token, Location), LexError>;
 
-const SIMPLE_MATCH_STRINGS: [&str; 23] = [
-    r"^\{", r"^\}", r"^\(", r"^\)", r"^;", r"^:=", r"^==", r"^=", r"^<=", r"^<", r"^>=", r"^>",
+const SIMPLE_MATCH_STRINGS: [&str; 24] = [
+    r"^\{", r"^\}", r"^\(", r"^\)", r"^;", r"^:=", r"^==", r"^!=", r"^=", r"^<=", r"^<", r"^>=", r"^>",
     r"^,", r"^\+", r"^-\D", r"^\*", r"^/", r"^%", r"^true", r"^false", r"^func", r"^if", r"^else",
 ];
-const SIMPLE_MATCH_LENGTHS: [usize; 23] = [1, 1, 1, 1, 1, 2, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 4, 5, 4, 2, 4];
-const SIMPLE_MATCH_TOKENS: [Token; 23] = [
+const SIMPLE_MATCH_LENGTHS: [usize; 24] = [1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 4, 5, 4, 2, 4];
+const SIMPLE_MATCH_TOKENS: [Token; 24] = [
     Token::OpenBrace,
     Token::CloseBrace,
     Token::OpenParens,
@@ -112,6 +114,7 @@ const SIMPLE_MATCH_TOKENS: [Token; 23] = [
     Token::Semicolon,
     Token::Define,
     Token::DoubleEquals,
+    Token::NotEquals,
     Token::Equals,
     Token::LessEquals,
     Token::Less,

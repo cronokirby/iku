@@ -41,6 +41,7 @@ Expr: Expr = {
 
 Expr1: Expr = {
   <left:Expr2> "==" <right:Expr2> => Expr::BinOp(Op::Equal, Box::new(left), Box::new(right)),
+  <left:Expr2> "!=" <right:Expr2> => Expr::BinOp(Op::NotEqual, Box::new(left), Box::new(right)),
   Expr2,
 };
 
@@ -107,6 +108,7 @@ extern {
     ";" => lexer::Token::Semicolon,
     ":=" => lexer::Token::Define,
     "==" => lexer::Token::DoubleEquals,
+    "!=" => lexer::Token::NotEquals,
     "=" => lexer::Token::Equals,
     "<=" => lexer::Token::LessEquals,
     "<" => lexer::Token::Less,
