@@ -1,6 +1,7 @@
 # Version 0.3.0
 
 - Add != operator
+- Add && operator
 
 # Version 0.2.0
 

@@ -41,7 +41,17 @@ pub enum Op {
     /// Division
     Div,
     /// Modulo
-    Mod
+    Mod,
+}
+
+/// Represents a short circuiting operation between booleans.
+///
+/// This is treated differently from standard operators, because the evaluation
+/// is short-circuiting.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum BoolOp {
+    /// The && operator
+    And,
 }
 
 /// Represents an expression in the Iku language.
@@ -64,6 +74,8 @@ pub enum Expr {
     Block(Vec<Expr>),
     /// A binary operation between two arguments
     BinOp(Op, Box<Expr>, Box<Expr>),
+    /// A conditional short circuiting operation between two arguments
+    ConditionalOp(BoolOp, Box<Expr>, Box<Expr>),
     /// An if else expresion, like `if y { 3 } else { 4 }`
     IfElse(Box<Expr>, Vec<Expr>, Vec<Expr>),
     /// A reference to a variable name

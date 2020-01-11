@@ -40,33 +40,38 @@ Expr: Expr = {
 }
 
 Expr1: Expr = {
-  <left:Expr2> "==" <right:Expr2> => Expr::BinOp(Op::Equal, Box::new(left), Box::new(right)),
-  <left:Expr2> "!=" <right:Expr2> => Expr::BinOp(Op::NotEqual, Box::new(left), Box::new(right)),
+  <left:Expr2> "&&" <right:Expr1> => Expr::ConditionalOp(BoolOp::And, Box::new(left), Box::new(right)),
   Expr2,
 };
 
 Expr2: Expr = {
-  <left:Expr3> "<=" <right:Expr3> => Expr::BinOp(Op::Leq, Box::new(left), Box::new(right)),
-  <left:Expr3> "<" <right:Expr3> => Expr::BinOp(Op::Less, Box::new(left), Box::new(right)),
-  <left:Expr3> ">=" <right:Expr3> => Expr::BinOp(Op::Geq, Box::new(left), Box::new(right)),
-  <left:Expr3> ">" <right:Expr3> => Expr::BinOp(Op::Greater, Box::new(left), Box::new(right)),
-  Expr3
+  <left:Expr3> "==" <right:Expr3> => Expr::BinOp(Op::Equal, Box::new(left), Box::new(right)),
+  <left:Expr3> "!=" <right:Expr3> => Expr::BinOp(Op::NotEqual, Box::new(left), Box::new(right)),
+  Expr3,
 };
 
 Expr3: Expr = {
-  <left:Expr3> "+" <right:Expr4> => Expr::BinOp(Op::Add, Box::new(left), Box::new(right)),
-  <left:Expr3> "-" <right:Expr4> => Expr::BinOp(Op::Sub, Box::new(left), Box::new(right)),
-  Expr4,
+  <left:Expr4> "<=" <right:Expr4> => Expr::BinOp(Op::Leq, Box::new(left), Box::new(right)),
+  <left:Expr4> "<" <right:Expr4> => Expr::BinOp(Op::Less, Box::new(left), Box::new(right)),
+  <left:Expr4> ">=" <right:Expr4> => Expr::BinOp(Op::Geq, Box::new(left), Box::new(right)),
+  <left:Expr4> ">" <right:Expr4> => Expr::BinOp(Op::Greater, Box::new(left), Box::new(right)),
+  Expr4
 };
 
 Expr4: Expr = {
-  <left:Expr4> "*" <right:Expr5> => Expr::BinOp(Op::Mul, Box::new(left), Box::new(right)),
-  <left:Expr4> "/" <right:Expr5> => Expr::BinOp(Op::Div, Box::new(left), Box::new(right)),
-  <left:Expr4> "%" <right:Expr5> => Expr::BinOp(Op::Mod, Box::new(left), Box::new(right)),
+  <left:Expr4> "+" <right:Expr5> => Expr::BinOp(Op::Add, Box::new(left), Box::new(right)),
+  <left:Expr4> "-" <right:Expr5> => Expr::BinOp(Op::Sub, Box::new(left), Box::new(right)),
   Expr5,
 };
 
 Expr5: Expr = {
+  <left:Expr5> "*" <right:Expr6> => Expr::BinOp(Op::Mul, Box::new(left), Box::new(right)),
+  <left:Expr5> "/" <right:Expr6> => Expr::BinOp(Op::Div, Box::new(left), Box::new(right)),
+  <left:Expr5> "%" <right:Expr6> => Expr::BinOp(Op::Mod, Box::new(left), Box::new(right)),
+  Expr6,
+};
+
+Expr6: Expr = {
   <value:name> "(" <args:Comma<Expr>> ")" => Expr::Call(value, args),
   <l:Litteral> => Expr::Litt(l),
   <value:name> => Expr::Name(value),
@@ -120,6 +125,7 @@ extern {
     "*" => lexer::Token::Asterisk,
     "/" => lexer::Token::Slash,
     "%" => lexer::Token::Percent,
+    "&&" => lexer::Token::DoubleAmpersand,
     "func" => lexer::Token::Func,
     "if" => lexer::Token::If,
     "else" => lexer::Token::Else,

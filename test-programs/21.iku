@@ -1,0 +1,5 @@
+func main() {
+  if false && print(0) {
+  }
+  print(true && false)
+}

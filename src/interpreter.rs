@@ -197,10 +197,21 @@ impl<C: Context> Interpreter<C> {
             Op::Equal => Ok(Litteral::Bool(left == right)),
             Op::NotEqual => Ok(Litteral::Bool(left != right)),
             // All of these only work on ints
-            Op::Leq | Op::Less | Op::Geq | Op::Greater | Op::Add | Op::Sub | Op::Mul | Op::Div | Op::Mod => {
+            Op::Leq
+            | Op::Less
+            | Op::Geq
+            | Op::Greater
+            | Op::Add
+            | Op::Sub
+            | Op::Mul
+            | Op::Div
+            | Op::Mod => {
                 let (l, r) = match (left, right) {
                     (Litteral::I64(l), Litteral::I64(r)) => Ok((l, r)),
-                    (l, r) => fail(format!("Cannot compare {:?} and {:?}", l, r)),
+                    (l, r) => fail(format!(
+                        "Op {:?} only works on I64, but got {:?} and {:?}",
+                        op, l, r
+                    )),
                 }?;
                 let res = match op {
                     Op::Leq => Litteral::Bool(l <= r),
@@ -217,6 +228,30 @@ impl<C: Context> Interpreter<C> {
                 Ok(res)
             }
         }
+    }
+
+    fn eval_conditional_op(
+        &mut self,
+        op: BoolOp,
+        left: &Expr,
+        right: &Expr,
+    ) -> InterpreterResult<Litteral> {
+        let left = match self.eval_expr(left)? {
+            Litteral::Bool(b) => b,
+            wrong_type => {
+                return fail(format!(
+                    "Expected boolean with {:?}, but found {:?}",
+                    op, wrong_type
+                ));
+            }
+        };
+        let short = match op {
+            BoolOp::And => false,
+        };
+        if left == short {
+            return Ok(Litteral::Bool(short));
+        };
+        self.eval_expr(right)
     }
 
     fn eval_if_else(
@@ -273,6 +308,7 @@ impl<C: Context> Interpreter<C> {
                 res
             }
             Expr::BinOp(op, left, right) => self.eval_bin_op(*op, left, right),
+            Expr::ConditionalOp(op, left, right) => self.eval_conditional_op(*op, left, right),
             Expr::IfElse(cond, if_part, right_part) => self.eval_if_else(cond, if_part, right_part),
         }
     }
