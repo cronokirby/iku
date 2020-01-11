@@ -1,7 +1,7 @@
 # Version 0.3.0
 
 - Add != operator
-- Add && operator
+- Add && and || operators
 
 # Version 0.2.0
 

@@ -247,6 +247,7 @@ impl<C: Context> Interpreter<C> {
         };
         let short = match op {
             BoolOp::And => false,
+            BoolOp::Or => true,
         };
         if left == short {
             return Ok(Litteral::Bool(short));

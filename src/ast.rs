@@ -52,6 +52,8 @@ pub enum Op {
 pub enum BoolOp {
     /// The && operator
     And,
+    /// The || operator
+    Or
 }
 
 /// Represents an expression in the Iku language.
