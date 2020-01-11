@@ -77,6 +77,11 @@ Expr6: Expr = {
 };
 
 Expr7: Expr = {
+  "!" <Expr8> => Expr::Not(Box::new(<>)),
+  <Expr8>,
+};
+
+Expr8: Expr = {
   <value:name> "(" <args:Comma<Expr>> ")" => Expr::Call(value, args),
   <l:Litteral> => Expr::Litt(l),
   <value:name> => Expr::Name(value),
@@ -132,6 +137,7 @@ extern {
     "%" => lexer::Token::Percent,
     "&&" => lexer::Token::DoubleAmpersand,
     "||" => lexer::Token::DoublePipe,
+    "!" => lexer::Token::Exclamation,
     "func" => lexer::Token::Func,
     "if" => lexer::Token::If,
     "else" => lexer::Token::Else,

@@ -80,6 +80,8 @@ pub enum Expr {
     ConditionalOp(BoolOp, Box<Expr>, Box<Expr>),
     /// An if else expresion, like `if y { 3 } else { 4 }`
     IfElse(Box<Expr>, Vec<Expr>, Vec<Expr>),
+    /// The unary negation operator !
+    Not(Box<Expr>),
     /// A reference to a variable name
     Name(String),
 }

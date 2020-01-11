@@ -2,6 +2,7 @@
 
 - Add != operator
 - Add && and || operators
+- Add ! operator
 
 # Version 0.2.0
 

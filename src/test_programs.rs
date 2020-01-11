@@ -25,6 +25,7 @@ const PROG_19: &'static str = include_str!("../test-programs/19.iku");
 const PROG_20: &'static str = include_str!("../test-programs/20.iku");
 const PROG_21: &'static str = include_str!("../test-programs/21.iku");
 const PROG_22: &'static str = include_str!("../test-programs/22.iku");
+const PROG_23: &'static str = include_str!("../test-programs/23.iku");
 
 #[derive(Debug)]
 struct FakeContext<'a> {
@@ -676,4 +677,31 @@ fn test_prog_22() {
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "1\n");
+}
+
+#[test]
+fn test_prog_23() {
+    let lexer = Lexer::new(PROG_23);
+    let res = ASTParser::new().parse(lexer);
+    let body = vec![
+        Expr::Call(
+            "print".into(),
+            vec![Expr::Not(Box::new(Expr::Litt(Litteral::Bool(true))))],
+        ),
+        Expr::Call(
+            "print".into(),
+            vec![Expr::Not(Box::new(Expr::Litt(Litteral::Bool(false))))],
+        ),
+    ];
+    let ast = AST {
+        functions: vec![Function {
+            name: "main".into(),
+            args: vec![],
+            body,
+        }],
+    };
+    assert_eq!(res.as_ref(), Ok(&ast));
+    let mut interpreted = String::new();
+    assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
+    assert_eq!(&interpreted, "false\ntrue\n");
 }

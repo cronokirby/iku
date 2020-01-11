@@ -311,6 +311,13 @@ impl<C: Context> Interpreter<C> {
             Expr::BinOp(op, left, right) => self.eval_bin_op(*op, left, right),
             Expr::ConditionalOp(op, left, right) => self.eval_conditional_op(*op, left, right),
             Expr::IfElse(cond, if_part, right_part) => self.eval_if_else(cond, if_part, right_part),
+            Expr::Not(expr) => match self.eval_expr(expr)? {
+                Litteral::Bool(b) => Ok(Litteral::Bool(!b)),
+                wrong_type => fail(format!(
+                    "The operator ! only applies to Bool, but got {:?}",
+                    wrong_type
+                )),
+            },
         }
     }
 
