@@ -1,4 +1,4 @@
-func foo(x, y) {
+func foo(x I64, y I64) {
   print(x)
   print(y)
 }

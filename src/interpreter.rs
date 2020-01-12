@@ -343,8 +343,8 @@ impl<C: Context> Interpreter<C> {
                         args.len()
                     ));
                 };
-                for (i, arg) in args.iter().enumerate() {
-                    self.scopes.create(f.args[i].clone(), arg.clone());
+                for (i, (arg, _)) in f.args.iter().enumerate() {
+                    self.scopes.create(arg.clone(), args[i].clone());
                 }
                 // We need to clone, because Rust doesn't know that evaluation
                 // won't change the contents of f

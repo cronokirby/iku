@@ -57,6 +57,7 @@ fn test_prog_1() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -78,6 +79,7 @@ fn test_prog_2() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -102,6 +104,7 @@ fn test_prog_3() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -123,6 +126,7 @@ fn test_prog_4() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -144,6 +148,7 @@ fn test_prog_5() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -165,6 +170,7 @@ fn test_prog_6() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -195,6 +201,7 @@ fn test_prog_7() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -218,6 +225,7 @@ fn test_prog_8() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -241,11 +249,13 @@ fn test_prog_9() {
             Function {
                 name: "foo".into(),
                 args: vec![],
+                ret: None,
                 body: body_foo,
             },
             Function {
                 name: "main".into(),
                 args: vec![],
+                ret: None,
                 body: body_main,
             },
         ],
@@ -272,12 +282,17 @@ fn test_prog_10() {
         functions: vec![
             Function {
                 name: "foo".into(),
-                args: vec!["x".into(), "y".into()],
+                args: vec![
+                    ("x".into(), TypeName::Name("I64".into())),
+                    ("y".into(), TypeName::Name("I64".into())),
+                ],
+                ret: None,
                 body: body_foo,
             },
             Function {
                 name: "main".into(),
                 args: vec![],
+                ret: None,
                 body: body_main,
             },
         ],
@@ -300,6 +315,7 @@ fn test_prog_11() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -329,6 +345,7 @@ fn test_prog_12() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -364,6 +381,7 @@ fn test_prog_13() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -415,6 +433,7 @@ fn test_prog_14() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -447,6 +466,7 @@ fn test_prog_15() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -482,6 +502,7 @@ fn test_prog_16() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -517,6 +538,7 @@ fn test_prog_17() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -550,6 +572,7 @@ fn test_prog_18() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -575,6 +598,7 @@ fn test_prog_19() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -600,6 +624,7 @@ fn test_prog_20() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -639,6 +664,7 @@ fn test_prog_21() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -671,6 +697,7 @@ fn test_prog_22() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -698,6 +725,7 @@ fn test_prog_23() {
         functions: vec![Function {
             name: "main".into(),
             args: vec![],
+            ret: None,
             body,
         }],
     };
@@ -727,11 +755,13 @@ fn test_prog_24() {
             Function {
                 name: "foo".into(),
                 args: vec![],
+                ret: None,
                 body: vec![],
             },
             Function {
                 name: "main".into(),
                 args: vec![],
+                ret: None,
                 body,
             },
         ],

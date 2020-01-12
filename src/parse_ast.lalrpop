@@ -18,8 +18,16 @@ pub AST: AST = {
   <functions:(<Function> ";"?)*> => AST {<>},
 };
 
+TypeName: TypeName = {
+  <name:type_name> => TypeName::Name(name),
+};
+
+Arg: (String, TypeName) = {
+  <name:name> <t_name:TypeName> => (name, t_name),
+};
+
 Function: Function = {
-  "func" <name:name> "(" <args:Comma<name>>")" <body:Block> => Function { name, args, body },
+  "func" <name:name> "(" <args:Comma<Arg>>")" <ret:TypeName?> <body:Block> => Function { name, args, ret, body },
 };
 
 Block: Vec<Expr> = {
@@ -153,6 +161,7 @@ extern {
     "if" => lexer::Token::If,
     "else" => lexer::Token::Else,
     name => lexer::Token::Name { value: <String> },
+    type_name => lexer::Token::TypeName { value: <String> },
     int => lexer::Token::IntLitteral { value: <i64> },
     string => lexer::Token::StringLitteral { value: <String> },
     bool => lexer::Token::BoolLitteral { value: <bool> },

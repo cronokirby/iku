@@ -119,6 +119,15 @@ pub enum Expr {
     Name(String),
 }
 
+/// Instead of being a type itself, this is just a syntactic reference to a type
+#[derive(Clone, Debug, PartialEq)]
+pub enum TypeName {
+    /// A raw name of a type
+    Name(String),
+    /// A tuple of type names
+    Tuple(Vec<TypeName>)
+}
+
 /// Represents a function definition.
 ///
 /// Functions have a name, as well as some code to run when they're called.
@@ -127,7 +136,9 @@ pub struct Function {
     /// The name we can use to call the function
     pub name: String,
     /// The named arguments this function accepts
-    pub args: Vec<String>,
+    pub args: Vec<(String, TypeName)>,
+    /// An optionally declared return type
+    pub ret: Option<TypeName>,
     /// The series of expressions making up the body of this function
     pub body: Vec<Expr>,
 }

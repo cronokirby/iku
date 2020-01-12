@@ -63,6 +63,10 @@ pub enum Token {
     Name {
         value: String,
     },
+    /// Type names are syntactically separate from other names
+    TypeName {
+        value: String,
+    },
 }
 
 /// Handle escape sequences when processing a litteral string.
@@ -155,6 +159,7 @@ pub struct Lexer<'d> {
     string_litteral_matcher: Regex,
     int_litteral_matcher: Regex,
     name_matcher: Regex,
+    type_name_matcher: Regex,
 }
 
 impl<'d> Lexer<'d> {
@@ -164,6 +169,7 @@ impl<'d> Lexer<'d> {
         let int_litteral_matcher = Regex::new(r"^-?[0-9]+").unwrap();
         let string_litteral_matcher = Regex::new(r#"^"([^"]*)""#).unwrap();
         let name_matcher = Regex::new(r"^[a-z]\w*").unwrap();
+        let type_name_matcher = Regex::new(r"^[A-Z]\w*").unwrap();
         Lexer {
             data,
             pos: 0,
@@ -173,6 +179,7 @@ impl<'d> Lexer<'d> {
             string_litteral_matcher,
             int_litteral_matcher,
             name_matcher,
+            type_name_matcher,
         }
     }
 
@@ -204,6 +211,16 @@ impl<'d> Lexer<'d> {
         if let Some(mat) = self.name_matcher.find(current_data) {
             let matched_string = mat.as_str();
             let matched_token = Token::Name {
+                value: String::from(matched_string),
+            };
+            let start = Location(self.pos);
+            self.pos += matched_string.len();
+            let end = Location(self.pos);
+            return Some(Ok((start, matched_token, end)));
+        }
+        if let Some(mat) = self.type_name_matcher.find(current_data) {
+            let matched_string = mat.as_str();
+            let matched_token = Token::TypeName {
                 value: String::from(matched_string),
             };
             let start = Location(self.pos);
