@@ -15,7 +15,7 @@ pub enum Litteral {
     /// A boolean litteral
     Bool(bool),
     /// A tuple, like (1, 2)
-    Tuple(Vec<Litteral>)
+    Tuple(Vec<Litteral>),
 }
 
 impl fmt::Display for Litteral {
@@ -30,11 +30,11 @@ impl fmt::Display for Litteral {
                 let mut iter = litterals.iter();
                 if let Some(l) = iter.next() {
                     l.fmt(f)?;
-                }
-                if let Some(l) = iter.next() {
-                    write!(f, ", {}", l)?;
-                } else {
-                    write!(f, ",")?;
+                    if let Some(l) = iter.next() {
+                        write!(f, ", {}", l)?;
+                    } else {
+                        write!(f, ",")?;
+                    }
                 }
                 for l in iter {
                     write!(f, ", {}", l)?;
@@ -84,7 +84,7 @@ pub enum BoolOp {
     /// The && operator
     And,
     /// The || operator
-    Or
+    Or,
 }
 
 /// Represents an expression in the Iku language.
@@ -125,7 +125,7 @@ pub enum TypeName {
     /// A raw name of a type
     Name(String),
     /// A tuple of type names
-    Tuple(Vec<TypeName>)
+    Tuple(Vec<TypeName>),
 }
 
 /// Represents a function definition.
@@ -158,6 +158,9 @@ mod test {
 
     #[test]
     fn display_works_for_single_tuples() {
-        assert_eq!("(1,)", format!("{}", Litteral::Tuple(vec![Litteral::I64(1)])));
+        assert_eq!(
+            "(1,)",
+            format!("{}", Litteral::Tuple(vec![Litteral::I64(1)]))
+        );
     }
 }
