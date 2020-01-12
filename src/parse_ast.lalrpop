@@ -14,12 +14,23 @@ Comma<T>: Vec<T> = {
   }
 }
 
+Tupled<T>: Vec<T> = {
+  "(" ")" => vec![],
+  "(" <T> "," ")" => vec![<>],
+  "(" <t1:T> <rest:("," <T>)+> ")" => {
+    let mut v = rest;
+    v.insert(0, t1);
+    v
+  }
+}
+
 pub AST: AST = {
   <functions:(<Function> ";"?)*> => AST {<>},
 };
 
 TypeName: TypeName = {
   <name:type_name> => TypeName::Name(name),
+  <names:Tupled<TypeName>> => TypeName::Tuple(names),
 };
 
 Arg: (String, TypeName) = {
@@ -100,13 +111,7 @@ Expr8: Expr = {
 };
 
 Tuple: Expr = {
-  "(" ")" => Expr::MakeTuple(vec![]),
-  "(" <Expr> "," ")" => Expr::MakeTuple(vec![<>]),
-  "(" <e1:Expr> <rest:("," <Expr>)+> ")" => {
-    let mut v = rest;
-    v.insert(0, e1);
-    Expr::MakeTuple(v)
-  }
+  <Tupled<Expr>> => Expr::MakeTuple(<>),
 };
 
 ExprIfElse: Expr = {
