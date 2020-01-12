@@ -1,5 +1,5 @@
 func main() {
-  if false && print(0) {
+  if false && { print(0); true } {
   }
   print(true && false)
 }

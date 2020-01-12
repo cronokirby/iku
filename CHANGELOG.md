@@ -1,3 +1,7 @@
+# Version 0.5.0
+
+- Add type checking
+
 # Version 0.4.0
 
 - Add tuples

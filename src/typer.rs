@@ -60,35 +60,41 @@ fn unit() -> Type {
     Type::Tuple(vec![])
 }
 
-/// This is used to reference functions
-struct FunctionTable<'a> {
-    // A mapping from name to index in this table
-    indices: HashMap<String, usize>,
-    // The actual functions
-    functions: &'a [Function],
+/// Types the interface of a function
+struct FunctionType {
+    args: Vec<Type>,
+    ret: Type
 }
 
-impl<'a> FunctionTable<'a> {
-    fn new(ast: &'a AST) -> Self {
-        let mut indices = HashMap::with_capacity(ast.functions.len());
-        for (i, f) in ast.functions.iter().enumerate() {
-            indices.insert(f.name.clone(), i);
+impl FunctionType {
+    fn from_func(func: &Function) -> Result<Self> {
+        let mut args = Vec::with_capacity(func.args.len());
+        for (_, type_name) in &func.args {
+            args.push(Type::from_name(type_name)?)
         }
-        FunctionTable {
-            functions: &ast.functions,
-            indices,
+        let ret = func.ret.as_ref().map(Type::from_name).unwrap_or(Ok(unit()))?;
+        Ok(FunctionType { args, ret })
+    }
+}
+
+/// This is used to reference functions
+struct FunctionTable {
+    // A mapping from name to functions
+    functions: HashMap<String, FunctionType>,
+}
+
+impl FunctionTable {
+    fn from_ast(ast: &AST) -> Result<Self> {
+        let mut functions = HashMap::with_capacity(ast.functions.len());
+        for f in &ast.functions {
+            let typ = FunctionType::from_func(f)?;
+            functions.insert(f.name.clone(), typ);
         }
+        Ok(FunctionTable { functions })
     }
 
-    fn get(&self, index: usize) -> &Function {
-        &self.functions[index]
-    }
-
-    fn index_of(&self, name: &str) -> Result<usize> {
-        self.indices.get(name).copied().ok_or(Error::from(format!(
-            "Trying to use unknown function {}",
-            name
-        )))
+    fn get(&self, name: &str) -> Option<&FunctionType> {
+        self.functions.get(name)
     }
 }
 
@@ -104,23 +110,190 @@ impl Typer {
         }
     }
 
-    fn type_expr(&mut self, tbl: &FunctionTable<'_>, expr: &Expr) -> Result<Type> {
-        unimplemented!()
+    fn type_litt(&self, litt: &Litteral) -> Type {
+        match litt {
+            Litteral::Str(_) => Type::Str,
+            Litteral::I64(_) => Type::I64,
+            Litteral::Bool(_) => Type::Bool,
+            Litteral::Tuple(litts) => {
+                Type::Tuple(litts.iter().map(|l| self.type_litt(l)).collect())
+            }
+        }
     }
 
-    fn type_block(&mut self, tbl: &FunctionTable<'_>, block: &[Expr]) -> Result<Type> {
-        for i in 0..block.len() - 1 {
-            self.type_expr(tbl, &block[i])?;
+    fn type_expr(&mut self, tbl: &FunctionTable, expr: &Expr) -> Result<Type> {
+        match expr {
+            Expr::Litt(litt) => Ok(self.type_litt(&litt)),
+            Expr::Declare(name, expr) => {
+                let typ = self.type_expr(tbl, expr)?;
+                self.scopes.create(name, typ.clone());
+                Ok(typ)
+            }
+            Expr::Assign(name, expr) => {
+                let current_type = self.scopes.get(&name).ok_or(Error::from(format!(
+                    "Trying to assign to undefined variable {}",
+                    name
+                )))?;
+                let current_type = current_type.clone();
+                let assigning = self.type_expr(tbl, expr)?;
+                if assigning != current_type {
+                    return fail(format!(
+                        "Trying to assign type {:?} to {}, a variable of type {:?}",
+                        assigning, name, current_type
+                    ));
+                }
+                Ok(assigning)
+            }
+            Expr::Block(exprs) => {
+                self.scopes.enter(true);
+                let res = self.type_block(tbl, exprs);
+                self.scopes.exit();
+                res
+            }
+            Expr::BinOp(op, left, right) => {
+                let left_type = self.type_expr(tbl, left)?;
+                let right_type = self.type_expr(tbl, right)?;
+                if left_type != right_type {
+                    return fail(format!(
+                        "Trying to apply binary options to mismatched types {:?} and {:?}",
+                        left_type, right_type
+                    ));
+                }
+                let may_expect = match op {
+                    Op::Equal => None,
+                    Op::NotEqual => None,
+                    Op::Leq
+                    | Op::Less
+                    | Op::Geq
+                    | Op::Greater
+                    | Op::Add
+                    | Op::Sub
+                    | Op::Mul
+                    | Op::Div
+                    | Op::Mod => Some(Type::I64),
+                };
+                if let Some(expected) = may_expect {
+                    if left_type != expected {
+                        return fail(format!(
+                            "Binary op {:?} requires type {:?}, but found {:?}",
+                            op, expected, left_type
+                        ));
+                    }
+                }
+                let typ = match op {
+                    Op::Equal | Op::NotEqual | Op::Leq | Op::Less | Op::Geq | Op::Greater => {
+                        Type::Bool
+                    }
+                    Op::Add | Op::Sub | Op::Mul | Op::Div | Op::Mod => Type::I64,
+                };
+                Ok(typ)
+            }
+            Expr::ConditionalOp(op, left, right) => {
+                let left_type = self.type_expr(tbl, left)?;
+                let right_type = self.type_expr(tbl, right)?;
+                if left_type != Type::Bool {
+                    return fail(format!(
+                        "Boolean op {:?} doesn't apply to type {:?}",
+                        op, left_type
+                    ));
+                }
+                if right_type != Type::Bool {
+                    return fail(format!(
+                        "Boolean op {:?} doesn't apply to type {:?}",
+                        op, right_type
+                    ));
+                }
+                Ok(Type::Bool)
+            }
+            Expr::IfElse(cond, if_part, else_part) => {
+                let cond_type = self.type_expr(tbl, cond)?;
+                if cond_type != Type::Bool {
+                    return fail(format!(
+                        "The condition of an if expression must be a Bool. Found {:?}",
+                        cond_type
+                    ));
+                }
+                let if_type = {
+                    self.scopes.enter(true);
+                    let res = self.type_block(tbl, if_part)?;
+                    self.scopes.exit();
+                    res
+                };
+                let else_type = {
+                    self.scopes.enter(true);
+                    let res = self.type_block(tbl, else_part)?;
+                    self.scopes.exit();
+                    res
+                };
+                if if_type != else_type {
+                    return fail(format!("The two branches of an if expression must have the same type. Found {:?} and {:?}", if_type, else_type));
+                }
+                Ok(if_type)
+            }
+            Expr::Not(expr) => {
+                let typ = self.type_expr(tbl, expr)?;
+                if typ != Type::Bool {
+                    return fail(format!(
+                        "The operator ! only applies to Bool. Found {:?}",
+                        typ
+                    ));
+                }
+                Ok(Type::Bool)
+            }
+            Expr::MakeTuple(exprs) => {
+                let mut types = Vec::with_capacity(exprs.len());
+                for e in exprs {
+                    types.push(self.type_expr(tbl, e)?);
+                }
+                Ok(Type::Tuple(types))
+            }
+            Expr::Name(name) => {
+                let typ = self.scopes.get(&name).ok_or(Error::from(format!(
+                    "Trying to use undefined variable {}",
+                    name
+                )))?;
+                Ok(typ.clone())
+            }
+            Expr::Call(func, args) => {
+                if func == "print" {
+                    return Ok(unit())
+                }
+                let func_type = tbl.get(func).ok_or(Error::from(format!("Trying to call undefined function {}", func)))?;
+                let mut arg_types = Vec::with_capacity(args.len());
+                for a in args {
+                    arg_types.push(self.type_expr(tbl, a)?);
+                }
+                if arg_types != func_type.args {
+                    return fail(format!("Trying to call {} with types {:?}, expected {:?} instead", func, arg_types, func_type.args));
+                }
+                Ok(func_type.ret.clone())
+            }
+        }
+    }
+
+    fn type_block(&mut self, tbl: &FunctionTable, block: &[Expr]) -> Result<Type> {
+        for i in 1..block.len(){
+            self.type_expr(tbl, &block[i - 1])?;
         }
         block.last().map_or(Ok(unit()), |x| self.type_expr(tbl, x))
     }
 
-    fn check_function(&mut self, tbl: &FunctionTable<'_>, f: &Function) -> Result<()> {
-        let expected = f.ret.as_ref().map(Type::from_name).unwrap_or(Ok(unit()))?;
+    fn check_function(&mut self, tbl: &FunctionTable, f: &Function) -> Result<()> {
+        let func_typ = FunctionType::from_func(f)?;
         self.scopes.enter(false);
+        for ((name, _), typ) in f.args.iter().zip(func_typ.args.iter()) {
+            self.scopes.create(name, typ.clone());
+        }
         let actual = self.type_block(tbl, &f.body)?;
         self.scopes.exit();
-        Ok(())
+        if func_typ.ret != actual {
+            fail(format!(
+                "In function {}, declared return type is {:?}, but found {:?}",
+                f.name, func_typ.ret, actual
+            ))
+        } else {
+            Ok(())
+        }
     }
 }
 
@@ -129,9 +302,9 @@ impl Typer {
 /// Nothing is returned in the case of a success, but we can then assume
 /// that no incorrect operations happen in the ast
 pub fn check(ast: &AST) -> Result<()> {
-    let tbl = FunctionTable::new(ast);
+    let tbl = FunctionTable::from_ast(ast)?;
     let mut typer = Typer::new();
-    for f in tbl.functions {
+    for f in &ast.functions {
         typer.check_function(&tbl, f)?;
     }
     Ok(())

@@ -1,8 +1,8 @@
 use crate::ast::*;
 use crate::interpreter::{interpret, Context};
 use crate::lexer::Lexer;
-use crate::typer::check;
 use crate::parse_ast::ASTParser;
+use crate::typer::check;
 
 const PROG_1: &'static str = include_str!("../test-programs/1.iku");
 const PROG_2: &'static str = include_str!("../test-programs/2.iku");
@@ -664,10 +664,10 @@ fn test_prog_21() {
             Box::new(Expr::ConditionalOp(
                 BoolOp::And,
                 Box::new(Expr::Litt(Litteral::Bool(false))),
-                Box::new(Expr::Call(
-                    "print".into(),
-                    vec![Expr::Litt(Litteral::I64(0))],
-                )),
+                Box::new(Expr::Block(vec![
+                    Expr::Call("print".into(), vec![Expr::Litt(Litteral::I64(0))]),
+                    Expr::Litt(Litteral::Bool(true)),
+                ])),
             )),
             vec![],
             vec![],
@@ -704,10 +704,10 @@ fn test_prog_22() {
         Box::new(Expr::ConditionalOp(
             BoolOp::Or,
             Box::new(Expr::Litt(Litteral::Bool(true))),
-            Box::new(Expr::Call(
-                "print".into(),
-                vec![Expr::Litt(Litteral::I64(0))],
-            )),
+            Box::new(Expr::Block(vec![
+                Expr::Call("print".into(), vec![Expr::Litt(Litteral::I64(0))]),
+                Expr::Litt(Litteral::Bool(true)),
+            ])),
         )),
         vec![Expr::Call(
             "print".into(),
