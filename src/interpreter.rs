@@ -1,9 +1,10 @@
 use crate::ast::*;
 use std::collections::HashMap;
 
-// The value we use when we have nothing to return
-// Eventually this will be an empty tuple
-const VOID: Litteral = Litteral::I64(0);
+// Unit is used like void in other languages.
+fn unit() -> Litteral {
+    Litteral::Tuple(vec![])
+}
 
 /// Represents the contextual abilities an interpreter needs.
 ///
@@ -178,7 +179,7 @@ impl<C: Context> Interpreter<C> {
     }
 
     fn eval_block(&mut self, exprs: &[Expr]) -> InterpreterResult<Litteral> {
-        let mut res = VOID;
+        let mut res = unit();
         for e in exprs {
             res = self.eval_expr(e)?;
         }
@@ -329,7 +330,7 @@ impl<C: Context> Interpreter<C> {
             let arg = args.get(0).ok_or("Not enough arguments to print")?;
             self.print_litteral(arg);
             self.scopes.exit();
-            return Ok(VOID);
+            return Ok(unit());
         };
         let res = match self.functions.get(name) {
             None => fail(format!("Trying to call undefined function {}", name)),
