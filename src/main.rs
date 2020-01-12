@@ -11,6 +11,7 @@ mod interpreter;
 mod lexer;
 #[cfg(test)]
 mod test_programs;
+mod typer;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "iku", about = "The iku programming language")]
