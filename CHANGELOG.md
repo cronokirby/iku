@@ -1,6 +1,7 @@
 # Version 0.4.0
 
 - Add tuples
+- Use a unit type (empty tuple) instead of returning 0 in the absence of a return
 
 # Version 0.3.0
 
