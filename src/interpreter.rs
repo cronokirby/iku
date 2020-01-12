@@ -164,16 +164,11 @@ impl<C: Context> Interpreter<C> {
             scopes: Scopes::new(),
             functions: HashMap::new(),
         }
+
     }
+
     fn print_litteral(&mut self, l: &Litteral) {
-        match l {
-            Litteral::I64(i) => self.ctx.print(&format!("{}\n", i)),
-            Litteral::Str(s) => {
-                self.ctx.print(s);
-                self.ctx.print("\n");
-            }
-            Litteral::Bool(s) => self.ctx.print(&format!("{}\n", s)),
-        }
+        self.ctx.print(&format!("{}\n", l));
     }
 
     fn read_name(&mut self, name: &str) -> InterpreterResult<&Litteral> {
@@ -318,6 +313,13 @@ impl<C: Context> Interpreter<C> {
                     wrong_type
                 )),
             },
+            Expr::MakeTuple(exprs) => {
+                let mut litterals = Vec::new();
+                for e in exprs {
+                    litterals.push(self.eval_expr(e)?);
+                }
+                Ok(Litteral::Tuple(litterals))
+            }
         }
     }
 

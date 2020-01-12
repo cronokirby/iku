@@ -1,3 +1,5 @@
+use std::fmt;
+
 /// Represents a litteral value in the language
 ///
 /// Litterals can be thought of as the fully evaluated result of an expression.
@@ -12,6 +14,28 @@ pub enum Litteral {
     I64(i64),
     /// A boolean litteral
     Bool(bool),
+    /// A tuple, like (1, 2)
+    Tuple(Vec<Litteral>)
+}
+
+impl fmt::Display for Litteral {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Litteral::Str(s) => write!(f, "{}", s),
+            Litteral::I64(i) => write!(f, "{}", i),
+            Litteral::Bool(b) => write!(f, "{}", b),
+            Litteral::Tuple(litterals) => {
+                write!(f, "(")?;
+                for (i, l) in litterals.iter().enumerate() {
+                    if i >= 1 {
+                        write!(f, ", ")?;
+                    }
+                    l.fmt(f)?;
+                }
+                write!(f, ")")
+            }
+        }
+    }
 }
 
 /// Represents what kind of operations exist
@@ -82,6 +106,8 @@ pub enum Expr {
     IfElse(Box<Expr>, Vec<Expr>, Vec<Expr>),
     /// The unary negation operator !
     Not(Box<Expr>),
+    /// The tuple constructor
+    MakeTuple(Vec<Expr>),
     /// A reference to a variable name
     Name(String),
 }

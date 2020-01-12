@@ -1,0 +1,8 @@
+func foo() {
+}
+
+func main() {
+  x := foo()
+  print(x)
+  print((1, 2))
+}

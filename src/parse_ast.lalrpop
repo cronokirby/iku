@@ -87,7 +87,18 @@ Expr8: Expr = {
   <value:name> => Expr::Name(value),
   <Block> => Expr::Block(<>),
   <ExprIfElse>,
+  <Tuple>,
   "(" <Expr> ")",
+};
+
+Tuple: Expr = {
+  "(" ")" => Expr::MakeTuple(vec![]),
+  "(" <Expr> "," ")" => Expr::MakeTuple(vec![<>]),
+  "(" <e1:Expr> <rest:("," <Expr>)+> ")" => {
+    let mut v = rest;
+    v.insert(0, e1);
+    Expr::MakeTuple(v)
+  }
 };
 
 ExprIfElse: Expr = {
