@@ -9,6 +9,7 @@ lalrpop_mod!(pub parse_ast);
 mod ast;
 mod interpreter;
 mod lexer;
+mod scopes;
 #[cfg(test)]
 mod test_programs;
 mod typer;
