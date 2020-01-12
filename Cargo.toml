@@ -1,6 +1,6 @@
 [package]
 name = "iku"
-version = "0.3.0"
+version = "0.5.0"
 authors = ["Lúcás Meier <cronokirby@gmail.com>"]
 edition = "2018"
 
