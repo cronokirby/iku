@@ -1,6 +1,7 @@
 use crate::ast::*;
 use crate::interpreter::{interpret, Context};
 use crate::lexer::Lexer;
+use crate::typer::check;
 use crate::parse_ast::ASTParser;
 
 const PROG_1: &'static str = include_str!("../test-programs/1.iku");
@@ -62,6 +63,7 @@ fn test_prog_1() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "2\n");
@@ -84,6 +86,7 @@ fn test_prog_2() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "-2\n");
@@ -109,6 +112,7 @@ fn test_prog_3() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, &format!("{}\n", PROG_3_LITT));
@@ -131,6 +135,7 @@ fn test_prog_4() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "1\n2\n");
@@ -153,6 +158,7 @@ fn test_prog_5() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "1\n2\n");
@@ -175,6 +181,7 @@ fn test_prog_6() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "6\n6\n");
@@ -206,6 +213,7 @@ fn test_prog_7() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "2\n2\n2\n");
@@ -230,6 +238,7 @@ fn test_prog_8() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "2\n3\n");
@@ -261,6 +270,7 @@ fn test_prog_9() {
         ],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "1\n");
@@ -298,6 +308,7 @@ fn test_prog_10() {
         ],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "1\n2\n");
@@ -320,6 +331,7 @@ fn test_prog_11() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "true\nfalse\n");
@@ -350,6 +362,7 @@ fn test_prog_12() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "2\n3\n");
@@ -386,6 +399,7 @@ fn test_prog_13() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "true\nfalse\n");
@@ -438,6 +452,7 @@ fn test_prog_14() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "false\ntrue\nfalse\ntrue\n");
@@ -471,6 +486,7 @@ fn test_prog_15() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "2\n");
@@ -507,6 +523,7 @@ fn test_prog_16() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "2\n");
@@ -543,6 +560,7 @@ fn test_prog_17() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "3\n1\n");
@@ -577,6 +595,7 @@ fn test_prog_18() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "17\n");
@@ -603,6 +622,7 @@ fn test_prog_19() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "1\n");
@@ -629,6 +649,7 @@ fn test_prog_20() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "true\n");
@@ -669,6 +690,7 @@ fn test_prog_21() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "false\n");
@@ -702,6 +724,7 @@ fn test_prog_22() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "1\n");
@@ -730,6 +753,7 @@ fn test_prog_23() {
         }],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "false\ntrue\n");
@@ -767,6 +791,7 @@ fn test_prog_24() {
         ],
     };
     assert_eq!(res.as_ref(), Ok(&ast));
+    assert!(check(&ast).is_ok());
     let mut interpreted = String::new();
     assert!(interpret(FakeContext::new(&mut interpreted), &ast).is_ok());
     assert_eq!(&interpreted, "()\n(1, 2)\n");

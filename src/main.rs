@@ -29,6 +29,10 @@ fn main() -> io::Result<()> {
     prog_file.read_to_string(&mut prog)?;
     let lexer = lexer::Lexer::new(&prog);
     let ast = parse_ast::ASTParser::new().parse(lexer).unwrap();
+    if let Err(e) = typer::check(&ast) {
+        println!("Type Error: {:?}", e);
+        return Ok(());
+    }
     if let Err(e) = interpreter::interpret(interpreter::RealContext, &ast) {
         println!("Interpreter Error: {:?}", e);
     };
