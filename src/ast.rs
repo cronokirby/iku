@@ -24,13 +24,20 @@ impl fmt::Display for Litteral {
             Litteral::Str(s) => write!(f, "{}", s),
             Litteral::I64(i) => write!(f, "{}", i),
             Litteral::Bool(b) => write!(f, "{}", b),
+            // This code is complicated because we want to print single tuples like (1,)
             Litteral::Tuple(litterals) => {
                 write!(f, "(")?;
-                for (i, l) in litterals.iter().enumerate() {
-                    if i >= 1 {
-                        write!(f, ", ")?;
-                    }
+                let mut iter = litterals.iter();
+                if let Some(l) = iter.next() {
                     l.fmt(f)?;
+                }
+                if let Some(l) = iter.next() {
+                    write!(f, ", {}", l)?;
+                } else {
+                    write!(f, ",")?;
+                }
+                for l in iter {
+                    write!(f, ", {}", l)?;
                 }
                 write!(f, ")")
             }
@@ -132,4 +139,14 @@ pub struct Function {
 #[derive(Clone, Debug, PartialEq)]
 pub struct AST {
     pub functions: Vec<Function>,
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn display_works_for_single_tuples() {
+        assert_eq!("(1,)", format!("{}", Litteral::Tuple(vec![Litteral::I64(1)])));
+    }
 }
